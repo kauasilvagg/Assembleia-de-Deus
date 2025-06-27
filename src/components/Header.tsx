@@ -1,107 +1,83 @@
+
 import { useState } from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { Menu, X, LogIn } from 'lucide-react';
+import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
+import { Menu, X } from 'lucide-react';
+import AuthButton from './AuthButton';
 
 const Header = () => {
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const location = useLocation();
+  const [isOpen, setIsOpen] = useState(false);
 
-  const navItems = [
-    { name: 'Início', path: '/' },
-    { name: 'Sobre Nós', path: '/sobre' },
-    { name: 'Ministérios', path: '/ministerios' },
-    { name: 'Eventos', path: '/eventos' },
-    { name: 'Sermões', path: '/sermoes' },
-    { name: 'Blog', path: '/blog' },
-    { name: 'Contato', path: '/contato' },
+  const navigation = [
+    { name: 'Início', href: '/' },
+    { name: 'Sobre Nós', href: '/sobre' },
+    { name: 'Ministérios', href: '/ministerios' },
+    { name: 'Eventos', href: '/eventos' },
+    { name: 'Sermões', href: '/sermoes' },
+    { name: 'Blog', href: '/blog' },
+    { name: 'Contato', href: '/contato' },
   ];
 
-  const isActive = (path: string) => location.pathname === path;
-
   return (
-    <header className="bg-white/95 backdrop-blur-md shadow-sm sticky top-0 z-50">
+    <header className="bg-white shadow-lg sticky top-0 z-50">
       <div className="container mx-auto px-4">
-        <div className="flex items-center justify-between h-16">
+        <div className="flex items-center justify-between h-16 md:h-20">
           {/* Logo */}
           <Link to="/" className="flex items-center space-x-2">
-            <div className="w-10 h-10 bg-gradient-to-br from-bethel-blue to-bethel-navy rounded-full flex items-center justify-center">
-              <span className="text-white font-bold">S</span>
+            <div className="w-10 h-10 bg-gradient-to-br from-bethel-blue to-bethel-navy rounded-lg flex items-center justify-center">
+              <span className="text-white font-bold text-lg">B</span>
             </div>
-            <div className="hidden sm:block">
-              <h1 className="font-playfair font-bold text-xl">
-                Assembleia de Deus Shalom do Parque Vitória
-              </h1>
+            <div className="hidden md:block">
+              <h1 className="font-playfair font-bold text-xl text-gray-900">Igreja Batista Bethel</h1>
+              <p className="text-xs text-gray-600">Comunidade de Fé e Amor</p>
             </div>
           </Link>
 
           {/* Desktop Navigation */}
-          <nav className="hidden lg:flex items-center space-x-1">
-            {navItems.map((item) => (
+          <nav className="hidden lg:flex items-center space-x-8">
+            {navigation.map((item) => (
               <Link
                 key={item.name}
-                to={item.path}
-                className={`px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
-                  isActive(item.path)
-                    ? 'text-bethel-blue bg-blue-50'
-                    : 'text-gray-700 hover:text-bethel-blue hover:bg-gray-50'
-                }`}
+                to={item.href}
+                className="text-gray-700 hover:text-bethel-blue transition-colors font-medium"
               >
                 {item.name}
               </Link>
             ))}
           </nav>
 
-          {/* Login Button */}
-          <div className="hidden lg:flex items-center space-x-4">
-            <Link to="/login">
-              <Button className="bg-bethel-blue hover:bg-bethel-navy">
-                <LogIn className="w-4 h-4 mr-2" />
-                Área do Membro
-              </Button>
-            </Link>
+          {/* Auth Button */}
+          <div className="hidden md:block">
+            <AuthButton />
           </div>
 
           {/* Mobile Menu Button */}
-          <button
-            onClick={() => setIsMenuOpen(!isMenuOpen)}
-            className="lg:hidden p-2 rounded-lg text-gray-700 hover:bg-gray-100"
-          >
-            {isMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
-          </button>
+          <Sheet open={isOpen} onOpenChange={setIsOpen}>
+            <SheetTrigger asChild className="lg:hidden">
+              <Button variant="ghost" size="sm">
+                <Menu className="h-6 w-6" />
+              </Button>
+            </SheetTrigger>
+            <SheetContent side="right" className="w-[300px] sm:w-[400px]">
+              <div className="flex flex-col space-y-4 mt-8">
+                {navigation.map((item) => (
+                  <Link
+                    key={item.name}
+                    to={item.href}
+                    className="text-lg font-medium text-gray-700 hover:text-bethel-blue transition-colors py-2"
+                    onClick={() => setIsOpen(false)}
+                  >
+                    {item.name}
+                  </Link>
+                ))}
+                <div className="pt-4 border-t">
+                  <AuthButton />
+                </div>
+              </div>
+            </SheetContent>
+          </Sheet>
         </div>
-
-        {/* Mobile Navigation */}
-        {isMenuOpen && (
-          <div className="lg:hidden py-4 border-t animate-fade-in">
-            <nav className="flex flex-col space-y-2">
-              {navItems.map((item) => (
-                <Link
-                  key={item.name}
-                  to={item.path}
-                  onClick={() => setIsMenuOpen(false)}
-                  className={`px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
-                    isActive(item.path)
-                      ? 'text-bethel-blue bg-blue-50'
-                      : 'text-gray-700 hover:text-bethel-blue hover:bg-gray-50'
-                  }`}
-                >
-                  {item.name}
-                </Link>
-              ))}
-              <Link
-                to="/login"
-                onClick={() => setIsMenuOpen(false)}
-                className="mt-4"
-              >
-                <Button className="w-full bg-bethel-blue hover:bg-bethel-navy">
-                  <LogIn className="w-4 h-4 mr-2" />
-                  Área do Membro
-                </Button>
-              </Link>
-            </nav>
-          </div>
-        )}
       </div>
     </header>
   );
