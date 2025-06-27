@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
@@ -27,11 +26,11 @@ const Header = () => {
           {/* Logo */}
           <Link to="/" className="flex items-center space-x-2">
             <div className="w-10 h-10 bg-gradient-to-br from-bethel-blue to-bethel-navy rounded-full flex items-center justify-center">
-              <span className="text-white font-bold text-lg">B</span>
+              <span className="text-white font-bold">S</span>
             </div>
             <div className="hidden sm:block">
-              <h1 className="font-playfair font-bold text-xl text-gray-900">
-                Igreja Batista Bethel
+              <h1 className="font-playfair font-bold text-xl">
+                Assembleia de Deus Shalom do Parque Vitória
               </h1>
             </div>
           </Link>

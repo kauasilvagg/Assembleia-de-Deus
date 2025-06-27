@@ -1,4 +1,3 @@
-
 import { Button } from '@/components/ui/button';
 import { Link } from 'react-router-dom';
 import { ArrowDown } from 'lucide-react';
@@ -21,7 +20,7 @@ const Hero = () => {
         <div className="animate-fade-in">
           <h1 className="font-playfair text-5xl md:text-7xl font-bold text-white mb-6 leading-tight">
             Bem-vindos à
-            <span className="block text-bethel-lightBlue">Igreja Batista Bethel</span>
+            <span className="block text-bethel-lightBlue">Assembleia de Deus Shalom do Parque Vitória</span>
           </h1>
           
           <p className="text-xl md:text-2xl text-gray-200 mb-8 leading-relaxed max-w-3xl mx-auto">
