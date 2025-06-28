@@ -9,6 +9,213 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      blog_posts: {
+        Row: {
+          author_id: string | null
+          author_name: string
+          category: string | null
+          content: string
+          created_at: string
+          excerpt: string | null
+          featured_image_url: string | null
+          id: string
+          is_featured: boolean | null
+          is_published: boolean | null
+          published_at: string | null
+          tags: string[] | null
+          title: string
+          updated_at: string
+          view_count: number | null
+        }
+        Insert: {
+          author_id?: string | null
+          author_name: string
+          category?: string | null
+          content: string
+          created_at?: string
+          excerpt?: string | null
+          featured_image_url?: string | null
+          id?: string
+          is_featured?: boolean | null
+          is_published?: boolean | null
+          published_at?: string | null
+          tags?: string[] | null
+          title: string
+          updated_at?: string
+          view_count?: number | null
+        }
+        Update: {
+          author_id?: string | null
+          author_name?: string
+          category?: string | null
+          content?: string
+          created_at?: string
+          excerpt?: string | null
+          featured_image_url?: string | null
+          id?: string
+          is_featured?: boolean | null
+          is_published?: boolean | null
+          published_at?: string | null
+          tags?: string[] | null
+          title?: string
+          updated_at?: string
+          view_count?: number | null
+        }
+        Relationships: []
+      }
+      contact_messages: {
+        Row: {
+          created_at: string
+          email: string
+          id: string
+          is_read: boolean | null
+          is_replied: boolean | null
+          message: string
+          message_type: string | null
+          name: string
+          notes: string | null
+          phone: string | null
+          replied_at: string | null
+          replied_by: string | null
+          subject: string
+        }
+        Insert: {
+          created_at?: string
+          email: string
+          id?: string
+          is_read?: boolean | null
+          is_replied?: boolean | null
+          message: string
+          message_type?: string | null
+          name: string
+          notes?: string | null
+          phone?: string | null
+          replied_at?: string | null
+          replied_by?: string | null
+          subject: string
+        }
+        Update: {
+          created_at?: string
+          email?: string
+          id?: string
+          is_read?: boolean | null
+          is_replied?: boolean | null
+          message?: string
+          message_type?: string | null
+          name?: string
+          notes?: string | null
+          phone?: string | null
+          replied_at?: string | null
+          replied_by?: string | null
+          subject?: string
+        }
+        Relationships: []
+      }
+      events: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          description: string | null
+          end_date: string | null
+          event_date: string
+          event_type: string | null
+          id: string
+          image_url: string | null
+          is_active: boolean | null
+          is_recurring: boolean | null
+          location: string | null
+          max_participants: number | null
+          recurring_pattern: string | null
+          registration_required: boolean | null
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          end_date?: string | null
+          event_date: string
+          event_type?: string | null
+          id?: string
+          image_url?: string | null
+          is_active?: boolean | null
+          is_recurring?: boolean | null
+          location?: string | null
+          max_participants?: number | null
+          recurring_pattern?: string | null
+          registration_required?: boolean | null
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          end_date?: string | null
+          event_date?: string
+          event_type?: string | null
+          id?: string
+          image_url?: string | null
+          is_active?: boolean | null
+          is_recurring?: boolean | null
+          location?: string | null
+          max_participants?: number | null
+          recurring_pattern?: string | null
+          registration_required?: boolean | null
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      ministries: {
+        Row: {
+          created_at: string
+          description: string | null
+          id: string
+          image_url: string | null
+          is_active: boolean | null
+          leader_email: string | null
+          leader_name: string | null
+          leader_phone: string | null
+          location: string | null
+          meeting_day: string | null
+          meeting_time: string | null
+          name: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          image_url?: string | null
+          is_active?: boolean | null
+          leader_email?: string | null
+          leader_name?: string | null
+          leader_phone?: string | null
+          location?: string | null
+          meeting_day?: string | null
+          meeting_time?: string | null
+          name: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          image_url?: string | null
+          is_active?: boolean | null
+          leader_email?: string | null
+          leader_name?: string | null
+          leader_phone?: string | null
+          location?: string | null
+          meeting_day?: string | null
+          meeting_time?: string | null
+          name?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           created_at: string
@@ -30,6 +237,66 @@ export type Database = {
           id?: string
           phone?: string | null
           updated_at?: string
+        }
+        Relationships: []
+      }
+      sermons: {
+        Row: {
+          audio_url: string | null
+          biblical_text: string | null
+          created_at: string
+          created_by: string | null
+          description: string | null
+          duration_minutes: number | null
+          id: string
+          is_featured: boolean | null
+          notes: string | null
+          preacher_name: string
+          series_name: string | null
+          sermon_date: string
+          tags: string[] | null
+          title: string
+          updated_at: string
+          video_url: string | null
+          view_count: number | null
+        }
+        Insert: {
+          audio_url?: string | null
+          biblical_text?: string | null
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          duration_minutes?: number | null
+          id?: string
+          is_featured?: boolean | null
+          notes?: string | null
+          preacher_name: string
+          series_name?: string | null
+          sermon_date: string
+          tags?: string[] | null
+          title: string
+          updated_at?: string
+          video_url?: string | null
+          view_count?: number | null
+        }
+        Update: {
+          audio_url?: string | null
+          biblical_text?: string | null
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          duration_minutes?: number | null
+          id?: string
+          is_featured?: boolean | null
+          notes?: string | null
+          preacher_name?: string
+          series_name?: string | null
+          sermon_date?: string
+          tags?: string[] | null
+          title?: string
+          updated_at?: string
+          video_url?: string | null
+          view_count?: number | null
         }
         Relationships: []
       }

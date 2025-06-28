@@ -86,11 +86,11 @@ const Login = () => {
           
           <div className="flex items-center justify-center space-x-2 mb-4">
             <div className="w-12 h-12 bg-gradient-to-br from-bethel-blue to-bethel-navy rounded-lg flex items-center justify-center flex-shrink-0">
-              <span className="text-white font-bold text-xl">B</span>
+              <span className="text-white font-bold text-xl">S</span>
             </div>
             <div>
               <h1 className="text-2xl font-bold text-white">
-                Igreja Batista Bethel
+                Assembleia de Deus Shalom
               </h1>
               <p className="text-white/80">
                 {isLogin ? 'Faça login para acessar sua conta' : 'Junte-se à nossa comunidade'}
@@ -189,8 +189,8 @@ const Login = () => {
             {isLogin && (
               <div className="mt-6 text-center text-sm text-gray-600">
                 <p>Precisa de ajuda? Entre em contato conosco:</p>
-                <a href="mailto:contato@igrejabethel.com.br" className="text-bethel-blue hover:underline">
-                  contato@igrejabethel.com.br
+                <a href="mailto:contato@igrejashalom.com.br" className="text-bethel-blue hover:underline">
+                  contato@igrejashalom.com.br
                 </a>
               </div>
             )}

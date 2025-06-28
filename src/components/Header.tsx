@@ -26,11 +26,11 @@ const Header = () => {
           {/* Logo */}
           <Link to="/" className="flex items-center space-x-2">
             <div className="w-10 h-10 bg-gradient-to-br from-bethel-blue to-bethel-navy rounded-lg flex items-center justify-center">
-              <span className="text-white font-bold text-lg">B</span>
+              <span className="text-white font-bold text-lg">S</span>
             </div>
             <div className="hidden md:block">
-              <h1 className="font-playfair font-bold text-xl text-gray-900">Igreja Batista Bethel</h1>
-              <p className="text-xs text-gray-600">Comunidade de Fé e Amor</p>
+              <h1 className="font-playfair font-bold text-xl text-gray-900">Assembleia de Deus Shalom</h1>
+              <p className="text-xs text-gray-600">Parque Vitória</p>
             </div>
           </Link>
 

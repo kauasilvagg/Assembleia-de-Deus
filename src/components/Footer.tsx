@@ -1,3 +1,4 @@
+
 import { Link } from 'react-router-dom';
 import { Mail, Calendar } from 'lucide-react';
 
@@ -12,7 +13,7 @@ const Footer = () => {
               <div className="w-8 h-8 bg-gradient-to-br from-bethel-blue to-bethel-navy rounded-full flex items-center justify-center">
                 <span className="text-white font-bold text-sm">S</span>
               </div>
-              <h3 className="font-playfair font-bold text-lg">Assembleia de Deus Shalom do Parque Vitória</h3>
+              <h3 className="font-playfair font-bold text-lg">Assembleia de Deus Shalom</h3>
             </div>
             <p className="text-gray-400 text-sm leading-relaxed">
               Uma comunidade acolhedora onde você pode crescer na fé, participar de ministérios 
@@ -58,7 +59,7 @@ const Footer = () => {
                 <Mail className="w-4 h-4" />
                 <span>contato@igrejashalom.com.br</span>
               </div>
-              <p>Rua da Fé, 123<br />Centro - São Paulo/SP<br />CEP: 01234-567</p>
+              <p>Rua da Fé, 123<br />Parque Vitória - São Paulo/SP<br />CEP: 01234-567</p>
               <p>(11) 1234-5678</p>
             </div>
           </div>
@@ -66,7 +67,7 @@ const Footer = () => {
 
         <div className="border-t border-gray-800 mt-8 pt-8">
           <div className="flex flex-col md:flex-row justify-between items-center text-sm text-gray-400">
-            <p>&copy; 2024 Assembleia de Deus Shalom do Parque Vitória. Todos os direitos reservados.</p>
+            <p>&copy; 2024 Assembleia de Deus Shalom Parque Vitória. Todos os direitos reservados.</p>
             <div className="flex space-x-4 mt-4 md:mt-0">
               <Link to="/privacidade" className="hover:text-white transition-colors">
                 Política de Privacidade
