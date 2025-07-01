@@ -6,8 +6,9 @@ import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Plus, Users, Clock, MapPin, Phone, Mail } from 'lucide-react';
+import { Plus, Users, Clock, MapPin, Phone, Mail, Edit, Trash2 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import MinistryForm from '@/components/MinistryForm';
 
 interface Ministry {
   id: string;
@@ -28,6 +29,8 @@ const Ministries = () => {
   const { toast } = useToast();
   const [ministries, setMinistries] = useState<Ministry[]>([]);
   const [loading, setLoading] = useState(true);
+  const [showForm, setShowForm] = useState(false);
+  const [editingMinistry, setEditingMinistry] = useState<Ministry | null>(null);
 
   useEffect(() => {
     fetchMinistries();
@@ -55,6 +58,38 @@ const Ministries = () => {
     }
   };
 
+  const handleDelete = async (id: string) => {
+    if (!confirm('Tem certeza que deseja excluir este ministério?')) return;
+
+    try {
+      const { error } = await supabase
+        .from('ministries')
+        .update({ is_active: false })
+        .eq('id', id);
+
+      if (error) throw error;
+
+      setMinistries(ministries.filter(m => m.id !== id));
+      toast({
+        title: "Sucesso",
+        description: "Ministério excluído com sucesso."
+      });
+    } catch (error) {
+      console.error('Erro ao excluir ministério:', error);
+      toast({
+        title: "Erro",
+        description: "Não foi possível excluir o ministério.",
+        variant: "destructive"
+      });
+    }
+  };
+
+  const handleFormSuccess = () => {
+    setShowForm(false);
+    setEditingMinistry(null);
+    fetchMinistries();
+  };
+
   return (
     <div className="min-h-screen font-inter">
       <Header />
@@ -70,11 +105,25 @@ const Ministries = () => {
 
         {user && (
           <div className="flex justify-center mb-8">
-            <Button className="bg-bethel-blue hover:bg-bethel-navy">
+            <Button 
+              onClick={() => setShowForm(true)}
+              className="bg-bethel-blue hover:bg-bethel-navy"
+            >
               <Plus className="w-4 h-4 mr-2" />
               Adicionar Ministério
             </Button>
           </div>
+        )}
+
+        {showForm && (
+          <MinistryForm
+            ministry={editingMinistry}
+            onSuccess={handleFormSuccess}
+            onCancel={() => {
+              setShowForm(false);
+              setEditingMinistry(null);
+            }}
+          />
         )}
 
         {loading ? (
@@ -96,7 +145,7 @@ const Ministries = () => {
               Nenhum ministério encontrado
             </h3>
             <p className="text-gray-500">
-              Em breve teremos mais informações sobre nossos ministérios.
+              {user ? "Clique no botão acima para adicionar o primeiro ministério." : "Em breve teremos mais informações sobre nossos ministérios."}
             </p>
           </div>
         ) : (
@@ -113,9 +162,32 @@ const Ministries = () => {
                   </div>
                 )}
                 <CardHeader>
-                  <CardTitle className="text-xl font-bold text-gray-900">
-                    {ministry.name}
-                  </CardTitle>
+                  <div className="flex justify-between items-start">
+                    <CardTitle className="text-xl font-bold text-gray-900">
+                      {ministry.name}
+                    </CardTitle>
+                    {user && (
+                      <div className="flex space-x-2">
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => {
+                            setEditingMinistry(ministry);
+                            setShowForm(true);
+                          }}
+                        >
+                          <Edit className="w-4 h-4" />
+                        </Button>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => handleDelete(ministry.id)}
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </Button>
+                      </div>
+                    )}
+                  </div>
                   <CardDescription className="text-gray-600">
                     {ministry.description}
                   </CardDescription>
