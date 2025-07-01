@@ -1,6 +1,6 @@
-
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/hooks/useAuth';
+import { useUserRole } from '@/hooks/useUserRole';
 import { supabase } from '@/integrations/supabase/client';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
@@ -26,6 +26,7 @@ interface Ministry {
 
 const Ministries = () => {
   const { user } = useAuth();
+  const { isAdmin } = useUserRole();
   const { toast } = useToast();
   const [ministries, setMinistries] = useState<Ministry[]>([]);
   const [loading, setLoading] = useState(true);
@@ -103,7 +104,7 @@ const Ministries = () => {
           </p>
         </div>
 
-        {user && (
+        {user && isAdmin && (
           <div className="flex justify-center mb-8">
             <Button 
               onClick={() => setShowForm(true)}
@@ -145,7 +146,7 @@ const Ministries = () => {
               Nenhum ministério encontrado
             </h3>
             <p className="text-gray-500">
-              {user ? "Clique no botão acima para adicionar o primeiro ministério." : "Em breve teremos mais informações sobre nossos ministérios."}
+              {isAdmin ? "Clique no botão acima para adicionar o primeiro ministério." : "Em breve teremos mais informações sobre nossos ministérios."}
             </p>
           </div>
         ) : (
@@ -166,7 +167,7 @@ const Ministries = () => {
                     <CardTitle className="text-xl font-bold text-gray-900">
                       {ministry.name}
                     </CardTitle>
-                    {user && (
+                    {user && isAdmin && (
                       <div className="flex space-x-2">
                         <Button
                           variant="outline"

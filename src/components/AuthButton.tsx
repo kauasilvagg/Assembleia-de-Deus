@@ -1,13 +1,15 @@
 
 import { Button } from '@/components/ui/button';
-import { LogOut, User } from 'lucide-react';
+import { LogOut, User, Shield } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
+import { useUserRole } from '@/hooks/useUserRole';
 import { Link } from 'react-router-dom';
 
 const AuthButton = () => {
-  const { user, signOut, loading } = useAuth();
+  const { user, signOut, loading: authLoading } = useAuth();
+  const { isAdmin, loading: roleLoading } = useUserRole();
 
-  if (loading) {
+  if (authLoading || roleLoading) {
     return (
       <Button variant="ghost" disabled>
         Carregando...
@@ -21,6 +23,14 @@ const AuthButton = () => {
         <span className="text-sm text-gray-600 hidden md:block">
           Olá, {user.user_metadata?.full_name || user.email}
         </span>
+        {isAdmin && (
+          <Link to="/admin">
+            <Button variant="outline" size="sm" className="flex items-center space-x-1">
+              <Shield className="w-4 h-4" />
+              <span>Admin</span>
+            </Button>
+          </Link>
+        )}
         <Button
           variant="outline"
           size="sm"

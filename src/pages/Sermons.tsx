@@ -1,6 +1,6 @@
-
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/hooks/useAuth';
+import { useUserRole } from '@/hooks/useUserRole';
 import { supabase } from '@/integrations/supabase/client';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
@@ -29,6 +29,7 @@ interface Sermon {
 
 const Sermons = () => {
   const { user } = useAuth();
+  const { isAdmin } = useUserRole();
   const { toast } = useToast();
   const [sermons, setSermons] = useState<Sermon[]>([]);
   const [loading, setLoading] = useState(true);
@@ -109,7 +110,7 @@ const Sermons = () => {
           </p>
         </div>
 
-        {user && (
+        {user && isAdmin && (
           <div className="flex justify-center mb-8">
             <Button 
               onClick={() => setShowForm(true)}
@@ -154,7 +155,7 @@ const Sermons = () => {
               Nenhum sermão encontrado
             </h3>
             <p className="text-gray-500">
-              {user ? "Clique no botão acima para adicionar o primeiro sermão." : "Em breve teremos sermões disponíveis."}
+              {isAdmin ? "Clique no botão acima para adicionar o primeiro sermão." : "Em breve teremos sermões disponíveis."}
             </p>
           </div>
         ) : (
@@ -173,7 +174,7 @@ const Sermons = () => {
                         </Badge>
                       )}
                     </div>
-                    {user && (
+                    {user && isAdmin && (
                       <div className="flex space-x-1 ml-2">
                         <Button
                           variant="outline"
