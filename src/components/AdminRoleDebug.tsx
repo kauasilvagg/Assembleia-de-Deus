@@ -23,17 +23,15 @@ const AdminRoleDebug = () => {
         .select('*')
         .eq('user_id', user.id);
 
-      // Verificar se o usuário pode acessar a função is_admin
-      const { data: adminCheck, error: adminError } = await supabase
-        .rpc('is_admin', { _user_id: user.id });
+      // Verificar metadados do usuário
+      const userMetadata = user.user_metadata;
 
       setDebugInfo({
         userId: user.id,
         userEmail: user.email,
+        userMetadata,
         roleData,
         roleError,
-        adminCheck,
-        adminError,
         currentRole: userRole,
         isAdminFlag: isAdmin
       });
@@ -89,6 +87,48 @@ const AdminRoleDebug = () => {
     }
   };
 
+  const fixUserRole = async () => {
+    if (!user) return;
+
+    try {
+      // Verificar o tipo de usuário nos metadados
+      const userType = user.user_metadata?.user_type || 'user';
+      console.log('User metadata type:', userType);
+
+      // Deletar role existente se houver
+      await supabase
+        .from('user_roles')
+        .delete()
+        .eq('user_id', user.id);
+
+      // Criar novo role baseado nos metadados
+      const { error } = await supabase
+        .from('user_roles')
+        .insert({ 
+          user_id: user.id, 
+          role: userType as 'admin' | 'user'
+        });
+
+      if (error) throw error;
+
+      toast({
+        title: "Sucesso",
+        description: `Role corrigido para: ${userType}`
+      });
+
+      await refreshRole();
+      await fetchDebugInfo();
+
+    } catch (error) {
+      console.error('Erro ao corrigir role:', error);
+      toast({
+        title: "Erro",
+        description: "Não foi possível corrigir o role.",
+        variant: "destructive"
+      });
+    }
+  };
+
   useEffect(() => {
     if (user) {
       fetchDebugInfo();
@@ -116,10 +156,14 @@ const AdminRoleDebug = () => {
           <div>
             <strong>É Admin:</strong> {isAdmin ? 'Sim' : 'Não'}
           </div>
+          <div>
+            <strong>Tipo nos Metadados:</strong> {user.user_metadata?.user_type || 'Não definido'}
+          </div>
         </div>
 
         {debugInfo && (
           <div className="bg-gray-50 p-4 rounded text-xs">
+            <strong>Debug completo:</strong>
             <pre>{JSON.stringify(debugInfo, null, 2)}</pre>
           </div>
         )}
@@ -131,9 +175,12 @@ const AdminRoleDebug = () => {
           <Button onClick={refreshRole} variant="outline" size="sm">
             Refresh Role
           </Button>
+          <Button onClick={fixUserRole} variant="outline" size="sm">
+            Corrigir Role pelos Metadados
+          </Button>
           {!isAdmin && (
             <Button onClick={makeUserAdmin} size="sm">
-              Promover a Admin
+              Forçar Admin
             </Button>
           )}
         </div>

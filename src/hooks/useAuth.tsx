@@ -31,19 +31,22 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         // Se o usuário acabou de se registrar, criar o role
         if (event === 'SIGNED_UP' && session?.user) {
           console.log('User signed up, creating role...');
+          const userType = session.user.user_metadata?.user_type || 'user';
+          console.log('Creating role for user type:', userType);
+          
           setTimeout(async () => {
             try {
               const { error } = await supabase
                 .from('user_roles')
                 .insert({ 
                   user_id: session.user.id, 
-                  role: session.user.user_metadata?.user_type || 'user' 
+                  role: userType as 'admin' | 'user'
                 });
               
               if (error) {
                 console.error('Error creating user role:', error);
               } else {
-                console.log('User role created successfully');
+                console.log('User role created successfully as:', userType);
               }
             } catch (error) {
               console.error('Exception creating user role:', error);
