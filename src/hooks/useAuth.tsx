@@ -6,7 +6,7 @@ import { supabase } from '@/integrations/supabase/client';
 interface AuthContextType {
   user: User | null;
   session: Session | null;
-  signUp: (email: string, password: string, fullName: string) => Promise<{ error: any }>;
+  signUp: (email: string, password: string, fullName: string, userType?: 'admin' | 'user') => Promise<{ error: any }>;
   signIn: (email: string, password: string) => Promise<{ error: any }>;
   signOut: () => Promise<void>;
   loading: boolean;
@@ -22,10 +22,34 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   useEffect(() => {
     // Configurar listener de mudanças de autenticação
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      (event, session) => {
+      async (event, session) => {
+        console.log('Auth state changed:', event, session?.user?.id);
         setSession(session);
         setUser(session?.user ?? null);
         setLoading(false);
+
+        // Se o usuário acabou de se registrar, criar o role
+        if (event === 'SIGNED_UP' && session?.user) {
+          console.log('User signed up, creating role...');
+          setTimeout(async () => {
+            try {
+              const { error } = await supabase
+                .from('user_roles')
+                .insert({ 
+                  user_id: session.user.id, 
+                  role: session.user.user_metadata?.user_type || 'user' 
+                });
+              
+              if (error) {
+                console.error('Error creating user role:', error);
+              } else {
+                console.log('User role created successfully');
+              }
+            } catch (error) {
+              console.error('Exception creating user role:', error);
+            }
+          }, 1000);
+        }
       }
     );
 
@@ -39,8 +63,10 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     return () => subscription.unsubscribe();
   }, []);
 
-  const signUp = async (email: string, password: string, fullName: string) => {
+  const signUp = async (email: string, password: string, fullName: string, userType: 'admin' | 'user' = 'user') => {
     const redirectUrl = `${window.location.origin}/`;
+    
+    console.log('Signing up user with type:', userType);
     
     const { error } = await supabase.auth.signUp({
       email,
@@ -48,7 +74,8 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       options: {
         emailRedirectTo: redirectUrl,
         data: {
-          full_name: fullName
+          full_name: fullName,
+          user_type: userType
         }
       }
     });

@@ -35,6 +35,7 @@ const Login = () => {
 
     try {
       if (isLogin) {
+        console.log('Attempting login for:', email);
         const { error } = await signIn(email, password);
         if (error) {
           toast({
@@ -45,11 +46,12 @@ const Login = () => {
         } else {
           toast({
             title: "Login realizado com sucesso!",
-            description: `Bem-vindo de volta${userType === 'admin' ? ', Administrador' : ''}!`
+            description: "Bem-vindo de volta!"
           });
         }
       } else {
-        const { error } = await signUp(email, password, fullName);
+        console.log('Attempting signup for:', email, 'as', userType);
+        const { error } = await signUp(email, password, fullName, userType);
         if (error) {
           toast({
             title: "Erro ao criar conta",
@@ -59,7 +61,7 @@ const Login = () => {
         } else {
           toast({
             title: "Conta criada com sucesso!",
-            description: "Verifique seu e-mail para confirmar sua conta."
+            description: `Usuário ${userType === 'admin' ? 'administrador' : ''} criado. Verifique seu e-mail para confirmar sua conta.`
           });
         }
       }
@@ -116,35 +118,37 @@ const Login = () => {
           
           <CardContent>
             <form onSubmit={handleSubmit} className="space-y-4">
-              {/* Seleção do tipo de usuário */}
-              <div className="space-y-2">
-                <Label htmlFor="userType">Tipo de Acesso</Label>
-                <Select value={userType} onValueChange={(value: 'user' | 'admin') => setUserType(value)}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Selecione o tipo de acesso" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="user">
-                      <div className="flex items-center space-x-2">
-                        <User className="w-4 h-4" />
-                        <span>Usuário - Visualizar conteúdo</span>
-                      </div>
-                    </SelectItem>
-                    <SelectItem value="admin">
-                      <div className="flex items-center space-x-2">
-                        <Shield className="w-4 h-4" />
-                        <span>Administrador - Gerenciar sistema</span>
-                      </div>
-                    </SelectItem>
-                  </SelectContent>
-                </Select>
-                <p className="text-xs text-gray-500">
-                  {userType === 'admin' 
-                    ? 'Administradores podem criar e gerenciar conteúdo, eventos, sermões e usuários.'
-                    : 'Usuários podem visualizar conteúdo, participar de eventos e acessar área de membros.'
-                  }
-                </p>
-              </div>
+              {/* Seleção do tipo de usuário - só aparece no cadastro */}
+              {!isLogin && (
+                <div className="space-y-2">
+                  <Label htmlFor="userType">Tipo de Acesso</Label>
+                  <Select value={userType} onValueChange={(value: 'user' | 'admin') => setUserType(value)}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Selecione o tipo de acesso" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="user">
+                        <div className="flex items-center space-x-2">
+                          <User className="w-4 h-4" />
+                          <span>Usuário - Visualizar conteúdo</span>
+                        </div>
+                      </SelectItem>
+                      <SelectItem value="admin">
+                        <div className="flex items-center space-x-2">
+                          <Shield className="w-4 h-4" />
+                          <span>Administrador - Gerenciar sistema</span>
+                        </div>
+                      </SelectItem>
+                    </SelectContent>
+                  </Select>
+                  <p className="text-xs text-gray-500">
+                    {userType === 'admin' 
+                      ? 'Administradores podem criar e gerenciar conteúdo, eventos, sermões e usuários.'
+                      : 'Usuários podem visualizar conteúdo, participar de eventos e acessar área de membros.'
+                    }
+                  </p>
+                </div>
+              )}
 
               {!isLogin && (
                 <div className="space-y-2">
@@ -193,13 +197,13 @@ const Login = () => {
                   'Carregando...'
                 ) : isLogin ? (
                   <>
-                    {userType === 'admin' ? <Shield className="w-4 h-4 mr-2" /> : <LogIn className="w-4 h-4 mr-2" />}
-                    Entrar como {userType === 'admin' ? 'Administrador' : 'Usuário'}
+                    <LogIn className="w-4 h-4 mr-2" />
+                    Entrar
                   </>
                 ) : (
                   <>
                     <UserPlus className="w-4 h-4 mr-2" />
-                    Criar Conta
+                    Criar Conta {userType === 'admin' ? 'de Administrador' : ''}
                   </>
                 )}
               </Button>
@@ -219,25 +223,27 @@ const Login = () => {
             </div>
 
             {/* Informações sobre tipos de usuário */}
-            <div className="mt-6 p-4 bg-gray-50 rounded-lg text-sm">
-              <h4 className="font-semibold mb-2 text-gray-800">Tipos de Usuário:</h4>
-              <div className="space-y-2">
-                <div className="flex items-start space-x-2">
-                  <User className="w-4 h-4 mt-0.5 text-gray-600" />
-                  <div>
-                    <p className="font-medium text-gray-700">Usuário</p>
-                    <p className="text-gray-600">Visualizar conteúdo, eventos, sermões e blog</p>
+            {!isLogin && (
+              <div className="mt-6 p-4 bg-gray-50 rounded-lg text-sm">
+                <h4 className="font-semibold mb-2 text-gray-800">Tipos de Usuário:</h4>
+                <div className="space-y-2">
+                  <div className="flex items-start space-x-2">
+                    <User className="w-4 h-4 mt-0.5 text-gray-600" />
+                    <div>
+                      <p className="font-medium text-gray-700">Usuário</p>
+                      <p className="text-gray-600">Visualizar conteúdo, eventos, sermões e blog</p>
+                    </div>
                   </div>
-                </div>
-                <div className="flex items-start space-x-2">
-                  <Shield className="w-4 h-4 mt-0.5 text-gray-600" />
-                  <div>
-                    <p className="font-medium text-gray-700">Administrador</p>
-                    <p className="text-gray-600">Gerenciar todo o sistema, criar conteúdo e administrar usuários</p>
+                  <div className="flex items-start space-x-2">
+                    <Shield className="w-4 h-4 mt-0.5 text-gray-600" />
+                    <div>
+                      <p className="font-medium text-gray-700">Administrador</p>
+                      <p className="text-gray-600">Gerenciar todo o sistema, criar conteúdo e administrar usuários</p>
+                    </div>
                   </div>
                 </div>
               </div>
-            </div>
+            )}
 
             {isLogin && (
               <div className="mt-6 text-center text-sm text-gray-600">

@@ -33,26 +33,31 @@ export const useUserRole = (): UserRoleHook => {
         .from('user_roles')
         .select('role')
         .eq('user_id', user.id)
-        .single();
+        .maybeSingle();
 
       console.log('Role query result:', { data, error });
 
       if (error) {
-        if (error.code === 'PGRST116') {
-          // Usuário não tem role definido, criar um role padrão de 'user'
-          console.log('User has no role, creating default user role');
-          const { error: insertError } = await supabase
-            .from('user_roles')
-            .insert({ user_id: user.id, role: 'user' });
-          
-          if (insertError) {
-            console.error('Error creating default user role:', insertError);
-          }
-          
-          setUserRole('user');
+        console.error('Error fetching user role:', error);
+        setUserRole('user'); // Fallback para user
+      } else if (!data) {
+        // Usuário não tem role definido, tentar criar um
+        console.log('User has no role, attempting to create one...');
+        
+        // Verificar se há informação do tipo de usuário nos metadados
+        const userType = user.user_metadata?.user_type || 'user';
+        console.log('Creating role based on user metadata:', userType);
+        
+        const { error: insertError } = await supabase
+          .from('user_roles')
+          .insert({ user_id: user.id, role: userType as UserRole });
+        
+        if (insertError) {
+          console.error('Error creating user role:', insertError);
+          setUserRole('user'); // Fallback
         } else {
-          console.error('Error fetching user role:', error);
-          setUserRole('user'); // Fallback para user
+          console.log('User role created successfully as:', userType);
+          setUserRole(userType as UserRole);
         }
       } else {
         console.log('User role found:', data.role);
