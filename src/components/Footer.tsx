@@ -38,15 +38,7 @@ const Footer = () => {
             <div className="space-y-2 text-sm text-gray-400">
               <div className="flex items-center space-x-2">
                 <Calendar className="w-4 h-4" />
-                <span>Domingo: 9h e 19h</span>
-              </div>
-              <div className="flex items-center space-x-2">
-                <Calendar className="w-4 h-4" />
-                <span>Quarta: 19h30</span>
-              </div>
-              <div className="flex items-center space-x-2">
-                <Calendar className="w-4 h-4" />
-                <span>Sexta: 19h30 (Jovens)</span>
+                <span>Domingo: 8h e 19h</span>
               </div>
             </div>
           </div>
@@ -59,8 +51,8 @@ const Footer = () => {
                 <Mail className="w-4 h-4" />
                 <span>contato@igrejashalom.com.br</span>
               </div>
-              <p>Rua da Fé, 123<br />Parque Vitória - São Paulo/SP<br />CEP: 01234-567</p>
-              <p>(11) 1234-5678</p>
+              <p>Parque Vitória - São Luís/MA<br />CEP: 65123-250</p>
+              <p>(98) 1234-5678</p>
             </div>
           </div>
         </div>

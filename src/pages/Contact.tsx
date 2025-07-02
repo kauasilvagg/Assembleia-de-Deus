@@ -10,7 +10,7 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { MapPin, Phone, Mail, Clock, Send } from 'lucide-react';
-import { useToast } from '@/hooks/use-toast';
+import { useToast } = '@/hooks/use-toast';
 
 const Contact = () => {
   const { toast } = useToast();
@@ -29,16 +29,31 @@ const Contact = () => {
     setLoading(true);
 
     try {
-      const { error } = await supabase
+      // Save to database
+      const { error: dbError } = await supabase
         .from('contact_messages')
         .insert([formData]);
 
-      if (error) throw error;
+      if (dbError) throw dbError;
 
-      toast({
-        title: "Mensagem enviada com sucesso!",
-        description: "Entraremos em contato em breve."
+      // Send email notification
+      const { data, error: emailError } = await supabase.functions.invoke('send-contact-email', {
+        body: formData
       });
+
+      if (emailError) {
+        console.error('Error sending email:', emailError);
+        // Don't throw error here, as the message was saved to database
+        toast({
+          title: "Mensagem salva com sucesso!",
+          description: "Sua mensagem foi salva, mas pode haver um atraso no envio do email de confirmação."
+        });
+      } else {
+        toast({
+          title: "Mensagem enviada com sucesso!",
+          description: "Enviamos uma confirmação para seu email. Entraremos em contato em breve."
+        });
+      }
 
       setFormData({
         name: '',
@@ -95,9 +110,8 @@ const Contact = () => {
                   <div>
                     <h4 className="font-semibold text-gray-900">Endereço</h4>
                     <p className="text-gray-600">
-                      Rua da Fé, 123<br />
-                      Parque Vitória - São Paulo/SP<br />
-                      CEP: 01234-567
+                      Parque Vitória - São Luís/MA<br />
+                      CEP: 65123-250
                     </p>
                   </div>
                 </div>
@@ -106,7 +120,7 @@ const Contact = () => {
                   <Phone className="w-5 h-5 text-bethel-blue mt-1" />
                   <div>
                     <h4 className="font-semibold text-gray-900">Telefone</h4>
-                    <p className="text-gray-600">(11) 1234-5678</p>
+                    <p className="text-gray-600">(98) 1234-5678</p>
                   </div>
                 </div>
 
@@ -141,19 +155,11 @@ const Contact = () => {
               <CardContent className="space-y-2">
                 <div className="flex justify-between">
                   <span className="font-medium">Domingo (Manhã)</span>
-                  <span>9h00</span>
+                  <span>8h00</span>
                 </div>
                 <div className="flex justify-between">
                   <span className="font-medium">Domingo (Noite)</span>
                   <span>19h00</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="font-medium">Quarta-feira</span>
-                  <span>19h30</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="font-medium">Sexta (Jovens)</span>
-                  <span>19h30</span>
                 </div>
               </CardContent>
             </Card>
