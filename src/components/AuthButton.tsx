@@ -7,7 +7,9 @@ import { Link } from 'react-router-dom';
 
 const AuthButton = () => {
   const { user, signOut, loading: authLoading } = useAuth();
-  const { isAdmin, loading: roleLoading } = useUserRole();
+  const { isAdmin, userRole, loading: roleLoading } = useUserRole();
+
+  console.log('AuthButton state:', { user: !!user, isAdmin, userRole, authLoading, roleLoading });
 
   if (authLoading || roleLoading) {
     return (
@@ -22,6 +24,11 @@ const AuthButton = () => {
       <div className="flex items-center space-x-2">
         <span className="text-sm text-gray-600 hidden md:block">
           Olá, {user.user_metadata?.full_name || user.email}
+          {userRole && (
+            <span className="ml-1 text-xs bg-gray-100 px-2 py-1 rounded">
+              {userRole === 'admin' ? 'Admin' : 'Usuário'}
+            </span>
+          )}
         </span>
         {isAdmin && (
           <Link to="/admin">

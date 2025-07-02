@@ -6,6 +6,7 @@ import { useUserRole } from '@/hooks/useUserRole';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import UserRoleManager from '@/components/UserRoleManager';
+import AdminRoleDebug from '@/components/AdminRoleDebug';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Shield, Users, FileText, Calendar, MessageSquare } from 'lucide-react';
 
@@ -14,8 +15,11 @@ const Admin = () => {
   const { isAdmin, loading } = useUserRole();
   const navigate = useNavigate();
 
+  console.log('Admin page - User:', !!user, 'isAdmin:', isAdmin, 'loading:', loading);
+
   useEffect(() => {
     if (!loading && (!user || !isAdmin)) {
+      console.log('Redirecting to home - User authenticated:', !!user, 'Is admin:', isAdmin);
       navigate('/');
     }
   }, [user, isAdmin, loading, navigate]);
@@ -51,6 +55,8 @@ const Admin = () => {
             Gerencie todos os aspectos do sistema da Assembleia de Deus Shalom.
           </p>
         </div>
+
+        <AdminRoleDebug />
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
           <Card className="hover:shadow-lg transition-shadow cursor-pointer" onClick={() => navigate('/ministerios')}>

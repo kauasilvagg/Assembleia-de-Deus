@@ -18,27 +18,48 @@ export const useUserRole = (): UserRoleHook => {
   const [loading, setLoading] = useState(true);
 
   const fetchUserRole = async () => {
+    console.log('Fetching user role for user:', user?.id);
+    
     if (!user) {
+      console.log('No user found, setting role to null');
       setUserRole(null);
       setLoading(false);
       return;
     }
 
     try {
+      // Primeiro, verificar se o usuário tem um role na tabela user_roles
       const { data, error } = await supabase
         .from('user_roles')
         .select('role')
         .eq('user_id', user.id)
         .single();
 
+      console.log('Role query result:', { data, error });
+
       if (error) {
-        console.error('Erro ao buscar role do usuário:', error);
-        setUserRole('user'); // Fallback para user
+        if (error.code === 'PGRST116') {
+          // Usuário não tem role definido, criar um role padrão de 'user'
+          console.log('User has no role, creating default user role');
+          const { error: insertError } = await supabase
+            .from('user_roles')
+            .insert({ user_id: user.id, role: 'user' });
+          
+          if (insertError) {
+            console.error('Error creating default user role:', insertError);
+          }
+          
+          setUserRole('user');
+        } else {
+          console.error('Error fetching user role:', error);
+          setUserRole('user'); // Fallback para user
+        }
       } else {
+        console.log('User role found:', data.role);
         setUserRole(data.role as UserRole);
       }
     } catch (error) {
-      console.error('Erro ao buscar role:', error);
+      console.error('Exception while fetching role:', error);
       setUserRole('user');
     } finally {
       setLoading(false);
@@ -53,6 +74,8 @@ export const useUserRole = (): UserRoleHook => {
     setLoading(true);
     await fetchUserRole();
   };
+
+  console.log('Current user role state:', { userRole, isAdmin: userRole === 'admin', loading });
 
   return {
     userRole,
