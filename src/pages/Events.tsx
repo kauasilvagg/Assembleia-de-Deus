@@ -1,100 +1,74 @@
-import { useState } from 'react';
+
+import { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Calendar, Clock, MapPin, Search, Filter, CalendarDays } from 'lucide-react';
+import { Calendar, Clock, MapPin, Search, Filter, CalendarDays, Plus } from 'lucide-react';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
+import EventForm from '@/components/EventForm';
+import { supabase } from '@/integrations/supabase/client';
+import { useUserRole } from '@/hooks/useUserRole';
+import { useToast } from '@/hooks/use-toast';
+
+interface Event {
+  id: string;
+  title: string;
+  description: string | null;
+  event_date: string;
+  location: string | null;
+  event_type: string | null;
+  is_recurring: boolean | null;
+  registration_required: boolean | null;
+  max_participants: number | null;
+  is_active: boolean | null;
+}
 
 const Events = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedType, setSelectedType] = useState('todos');
   const [selectedMonth, setSelectedMonth] = useState('todos');
+  const [showEventForm, setShowEventForm] = useState(false);
+  const [events, setEvents] = useState<Event[]>([]);
+  const [loading, setLoading] = useState(true);
+  const { isAdmin } = useUserRole();
+  const { toast } = useToast();
 
-  const events = [
-    {
-      id: 1,
-      title: 'Culto de Celebração',
-      date: '2024-01-07',
-      time: '19:00',
-      location: 'Santuário Principal',
-      description: 'Um momento especial de adoração e comunhão com toda a família. Venha celebrar conosco e fortalecer sua fé através da música, oração e pregação da Palavra.',
-      type: 'culto',
-      recurring: true,
-      image: '/placeholder.svg',
-      speaker: 'Pr. João Silva',
-      capacity: 200
-    },
-    {
-      id: 2,
-      title: 'Conferência de Jovens',
-      date: '2024-01-12',
-      time: '19:30',
-      location: 'Auditório',
-      description: 'Três noites de louvor, palavra e comunhão para os jovens. Uma oportunidade única de crescimento espiritual e relacionamento com outros jovens cristãos.',
-      type: 'evento-especial',
-      recurring: false,
-      image: '/placeholder.svg',
-      speaker: 'Pr. Marcos Santos',
-      capacity: 150
-    },
-    {
-      id: 3,
-      title: 'Escola Bíblica Dominical',
-      date: '2024-01-07',
-      time: '09:00',
-      location: 'Salas de Aula',
-      description: 'Estudo da Palavra de Deus para todas as idades. Classes específicas para crianças, adolescentes, jovens e adultos.',
-      type: 'estudo',
-      recurring: true,
-      image: '/placeholder.svg',
-      speaker: 'Equipe de Professores',
-      capacity: 100
-    },
-    {
-      id: 4,
-      title: 'Encontro de Mulheres',
-      date: '2024-01-15',
-      time: '14:00',
-      location: 'Sala de Reuniões',
-      description: 'Momento especial para as mulheres da igreja se reunirem, orarem e estudarem a Bíblia juntas.',
-      type: 'encontro',
-      recurring: true,
-      image: '/placeholder.svg',
-      speaker: 'Maria Oliveira',
-      capacity: 50
-    },
-    {
-      id: 5,
-      title: 'Culto de Oração',
-      date: '2024-01-17',
-      time: '19:00',
-      location: 'Santuário Principal',
-      description: 'Noite dedicada à oração e intercessão. Venha orar pela igreja, família e necessidades.',
-      type: 'culto',
-      recurring: true,
-      image: '/placeholder.svg',
-      speaker: 'Pr. João Silva',
-      capacity: 200
-    },
-    {
-      id: 6,
-      title: 'Retiro de Famílias',
-      date: '2024-01-20',
-      time: '08:00',
-      location: 'Chácara Recanto',
-      description: 'Um fim de semana especial para fortalecer os laços familiares através de atividades, estudos bíblicos e comunhão.',
-      type: 'evento-especial',
-      recurring: false,
-      image: '/placeholder.svg',
-      speaker: 'Equipe Pastoral',
-      capacity: 80
+  const fetchEvents = async () => {
+    console.log('Fetching events from database...');
+    try {
+      const { data, error } = await supabase
+        .from('events')
+        .select('*')
+        .eq('is_active', true)
+        .order('event_date', { ascending: true });
+
+      if (error) {
+        console.error('Error fetching events:', error);
+        throw error;
+      }
+
+      console.log('Fetched events:', data);
+      setEvents(data || []);
+    } catch (error) {
+      console.error('Error loading events:', error);
+      toast({
+        title: 'Erro ao carregar eventos',
+        description: 'Não foi possível carregar os eventos. Tente novamente.',
+        variant: 'destructive',
+      });
+    } finally {
+      setLoading(false);
     }
-  ];
+  };
 
-  const getEventTypeColor = (type: string) => {
+  useEffect(() => {
+    fetchEvents();
+  }, []);
+
+  const getEventTypeColor = (type: string | null) => {
     switch (type) {
       case 'culto':
         return 'bg-green-100 text-green-800';
@@ -104,12 +78,16 @@ const Events = () => {
         return 'bg-blue-100 text-blue-800';
       case 'encontro':
         return 'bg-orange-100 text-orange-800';
+      case 'conferencia':
+        return 'bg-red-100 text-red-800';
+      case 'retiro':
+        return 'bg-indigo-100 text-indigo-800';
       default:
         return 'bg-gray-100 text-gray-800';
     }
   };
 
-  const getEventTypeLabel = (type: string) => {
+  const getEventTypeLabel = (type: string | null) => {
     switch (type) {
       case 'culto':
         return 'Culto';
@@ -119,8 +97,12 @@ const Events = () => {
         return 'Estudo Bíblico';
       case 'encontro':
         return 'Encontro';
+      case 'conferencia':
+        return 'Conferência';
+      case 'retiro':
+        return 'Retiro';
       default:
-        return type;
+        return type || 'Geral';
     }
   };
 
@@ -129,12 +111,17 @@ const Events = () => {
     return date.toLocaleDateString('pt-BR', {
       weekday: 'long',
       day: 'numeric',
-      month: 'long'
+      month: 'long',
+      year: 'numeric'
     });
   };
 
-  const formatTime = (timeString: string) => {
-    return timeString;
+  const formatTime = (dateString: string) => {
+    const date = new Date(dateString);
+    return date.toLocaleTimeString('pt-BR', {
+      hour: '2-digit',
+      minute: '2-digit'
+    });
   };
 
   const getMonthFromDate = (dateString: string) => {
@@ -144,18 +131,35 @@ const Events = () => {
 
   const filteredEvents = events.filter(event => {
     const matchesSearch = event.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         event.description.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesType = selectedType === 'todos' || event.type === selectedType;
-    const matchesMonth = selectedMonth === 'todos' || getMonthFromDate(event.date) === parseInt(selectedMonth);
+                         (event.description && event.description.toLowerCase().includes(searchTerm.toLowerCase()));
+    const matchesType = selectedType === 'todos' || event.event_type === selectedType;
+    const matchesMonth = selectedMonth === 'todos' || getMonthFromDate(event.event_date) === parseInt(selectedMonth);
     
     return matchesSearch && matchesType && matchesMonth;
   });
 
   const upcomingEvents = events.filter(event => {
-    const eventDate = new Date(event.date);
+    const eventDate = new Date(event.event_date);
     const today = new Date();
     return eventDate >= today;
   }).slice(0, 3);
+
+  const handleEventFormSuccess = () => {
+    fetchEvents();
+  };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gray-50">
+        <Header />
+        <div className="container mx-auto px-4 py-20 text-center">
+          <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-bethel-blue mx-auto"></div>
+          <p className="mt-4 text-gray-600">Carregando eventos...</p>
+        </div>
+        <Footer />
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -170,6 +174,18 @@ const Events = () => {
           <p className="text-xl max-w-2xl mx-auto">
             Participe dos nossos eventos e fortaleça sua fé junto com a comunidade
           </p>
+          {isAdmin && (
+            <div className="mt-8">
+              <Button 
+                onClick={() => setShowEventForm(true)}
+                className="bg-white text-bethel-blue hover:bg-gray-100"
+                size="lg"
+              >
+                <Plus className="w-5 h-5 mr-2" />
+                Cadastrar Novo Evento
+              </Button>
+            </div>
+          )}
         </div>
       </section>
 
@@ -198,6 +214,8 @@ const Events = () => {
                   <SelectItem value="estudo">Estudos Bíblicos</SelectItem>
                   <SelectItem value="encontro">Encontros</SelectItem>
                   <SelectItem value="evento-especial">Eventos Especiais</SelectItem>
+                  <SelectItem value="conferencia">Conferências</SelectItem>
+                  <SelectItem value="retiro">Retiros</SelectItem>
                 </SelectContent>
               </Select>
 
@@ -237,24 +255,29 @@ const Events = () => {
           {filteredEvents.length === 0 ? (
             <div className="text-center py-12">
               <CalendarDays className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-              <h3 className="text-xl font-semibold text-gray-600 mb-2">Nenhum evento encontrado</h3>
-              <p className="text-gray-500">Tente ajustar os filtros de busca</p>
+              <h3 className="text-xl font-semibold text-gray-600 mb-2">
+                {events.length === 0 
+                  ? 'Nenhum evento cadastrado' 
+                  : 'Nenhum evento encontrado'
+                }
+              </h3>
+              <p className="text-gray-500">
+                {events.length === 0 
+                  ? isAdmin ? 'Clique no botão acima para cadastrar o primeiro evento.' : 'Eventos serão exibidos aqui quando forem cadastrados.'
+                  : 'Tente ajustar os filtros de busca'
+                }
+              </p>
             </div>
           ) : (
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
               {filteredEvents.map((event, index) => (
                 <Card key={event.id} className="overflow-hidden hover:shadow-xl transition-all duration-300 animate-fade-in" style={{ animationDelay: `${index * 0.1}s` }}>
                   <div className="aspect-video bg-gradient-to-br from-bethel-blue to-bethel-navy relative">
-                    <img 
-                      src={event.image} 
-                      alt={event.title}
-                      className="w-full h-full object-cover opacity-20"
-                    />
                     <div className="absolute inset-0 flex items-center justify-center">
                       <Calendar className="w-12 h-12 text-white" />
                     </div>
-                    <Badge className={`absolute top-4 right-4 ${getEventTypeColor(event.type)} border-0`}>
-                      {event.recurring ? 'Recorrente' : 'Especial'}
+                    <Badge className={`absolute top-4 right-4 ${getEventTypeColor(event.event_type)} border-0`}>
+                      {event.is_recurring ? 'Recorrente' : 'Único'}
                     </Badge>
                   </div>
                   
@@ -264,8 +287,8 @@ const Events = () => {
                         {event.title}
                       </CardTitle>
                     </div>
-                    <Badge variant="outline" className={`${getEventTypeColor(event.type)} border-0`}>
-                      {getEventTypeLabel(event.type)}
+                    <Badge variant="outline" className={`${getEventTypeColor(event.event_type)} border-0 w-fit`}>
+                      {getEventTypeLabel(event.event_type)}
                     </Badge>
                   </CardHeader>
                   
@@ -273,30 +296,40 @@ const Events = () => {
                     <div className="space-y-3">
                       <div className="flex items-center text-gray-700">
                         <Calendar className="w-4 h-4 mr-2 text-bethel-blue flex-shrink-0" />
-                        <span className="capitalize text-sm">{formatDate(event.date)}</span>
+                        <span className="capitalize text-sm">{formatDate(event.event_date)}</span>
                       </div>
                       
                       <div className="flex items-center text-gray-700">
                         <Clock className="w-4 h-4 mr-2 text-bethel-blue flex-shrink-0" />
-                        <span className="text-sm">{formatTime(event.time)}</span>
+                        <span className="text-sm">{formatTime(event.event_date)}</span>
                       </div>
                       
-                      <div className="flex items-center text-gray-700">
-                        <MapPin className="w-4 h-4 mr-2 text-bethel-blue flex-shrink-0" />
-                        <span className="text-sm">{event.location}</span>
-                      </div>
+                      {event.location && (
+                        <div className="flex items-center text-gray-700">
+                          <MapPin className="w-4 h-4 mr-2 text-bethel-blue flex-shrink-0" />
+                          <span className="text-sm">{event.location}</span>
+                        </div>
+                      )}
                     </div>
 
-                    <p className="text-gray-600 text-sm leading-relaxed line-clamp-3">
-                      {event.description}
-                    </p>
+                    {event.description && (
+                      <p className="text-gray-600 text-sm leading-relaxed line-clamp-3">
+                        {event.description}
+                      </p>
+                    )}
 
-                    <div className="pt-4 border-t">
-                      <div className="flex justify-between items-center text-sm text-gray-500">
-                        <span>Palestrante: {event.speaker}</span>
-                        <span>Capacidade: {event.capacity}</span>
+                    {(event.registration_required || event.max_participants) && (
+                      <div className="pt-4 border-t">
+                        <div className="flex justify-between items-center text-sm text-gray-500">
+                          {event.registration_required && (
+                            <span>Inscrição obrigatória</span>
+                          )}
+                          {event.max_participants && (
+                            <span>Vagas: {event.max_participants}</span>
+                          )}
+                        </div>
                       </div>
-                    </div>
+                    )}
 
                     <Button className="w-full bg-bethel-blue hover:bg-bethel-navy">
                       Ver Detalhes
@@ -310,50 +343,62 @@ const Events = () => {
       </section>
 
       {/* Calendar Preview */}
-      <section className="py-16 bg-white">
-        <div className="container mx-auto px-4">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl font-playfair font-bold text-gray-900 mb-4">
-              Próximos Eventos
-            </h2>
-            <p className="text-gray-600 max-w-2xl mx-auto">
-              Confira os próximos eventos da nossa programação semanal
-            </p>
-          </div>
+      {upcomingEvents.length > 0 && (
+        <section className="py-16 bg-white">
+          <div className="container mx-auto px-4">
+            <div className="text-center mb-12">
+              <h2 className="text-3xl font-playfair font-bold text-gray-900 mb-4">
+                Próximos Eventos
+              </h2>
+              <p className="text-gray-600 max-w-2xl mx-auto">
+                Confira os próximos eventos da nossa programação
+              </p>
+            </div>
 
-          <div className="grid md:grid-cols-3 gap-6">
-            {upcomingEvents.map((event) => (
-              <Card key={event.id} className="border-l-4 border-l-bethel-blue">
-                <CardContent className="p-6">
-                  <div className="flex items-center justify-between mb-4">
-                    <Badge className={`${getEventTypeColor(event.type)} border-0`}>
-                      {getEventTypeLabel(event.type)}
-                    </Badge>
-                    <span className="text-sm text-gray-500">{formatDate(event.date)}</span>
-                  </div>
-                  
-                  <h3 className="font-semibold text-lg text-gray-900 mb-2">
-                    {event.title}
-                  </h3>
-                  
-                  <div className="flex items-center text-gray-600 text-sm mb-3">
-                    <Clock className="w-4 h-4 mr-1" />
-                    {event.time}
-                  </div>
-                  
-                  <p className="text-gray-600 text-sm line-clamp-2">
-                    {event.description}
-                  </p>
-                </CardContent>
-              </Card>
-            ))}
+            <div className="grid md:grid-cols-3 gap-6">
+              {upcomingEvents.map((event) => (
+                <Card key={event.id} className="border-l-4 border-l-bethel-blue">
+                  <CardContent className="p-6">
+                    <div className="flex items-center justify-between mb-4">
+                      <Badge className={`${getEventTypeColor(event.event_type)} border-0`}>
+                        {getEventTypeLabel(event.event_type)}
+                      </Badge>
+                      <span className="text-sm text-gray-500">{formatDate(event.event_date)}</span>
+                    </div>
+                    
+                    <h3 className="font-semibold text-lg text-gray-900 mb-2">
+                      {event.title}
+                    </h3>
+                    
+                    <div className="flex items-center text-gray-600 text-sm mb-3">
+                      <Clock className="w-4 h-4 mr-1" />
+                      {formatTime(event.event_date)}
+                    </div>
+                    
+                    {event.description && (
+                      <p className="text-gray-600 text-sm line-clamp-2">
+                        {event.description}
+                      </p>
+                    )}
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
           </div>
-        </div>
-      </section>
+        </section>
+      )}
+
+      {/* Event Form Modal */}
+      {showEventForm && (
+        <EventForm 
+          onClose={() => setShowEventForm(false)}
+          onSuccess={handleEventFormSuccess}
+        />
+      )}
 
       <Footer />
     </div>
   );
 };
 
-export default Events; 
+export default Events;
