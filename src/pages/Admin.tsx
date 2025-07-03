@@ -100,7 +100,7 @@ const Admin = () => {
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <EventForm />
+                <EventForm onClose={() => {}} onSuccess={() => {}} />
               </CardContent>
             </Card>
           </TabsContent>
@@ -114,7 +114,7 @@ const Admin = () => {
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <SermonForm />
+                <SermonForm onSuccess={() => {}} onCancel={() => {}} />
               </CardContent>
             </Card>
           </TabsContent>
@@ -128,7 +128,7 @@ const Admin = () => {
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <MinistryForm />
+                <MinistryForm onSuccess={() => {}} onCancel={() => {}} />
               </CardContent>
             </Card>
           </TabsContent>

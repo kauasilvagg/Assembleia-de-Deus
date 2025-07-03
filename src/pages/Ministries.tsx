@@ -8,6 +8,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Button } from '@/components/ui/button';
 import { Plus, Users, Clock, MapPin, Phone, Mail, Edit, Trash2 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import MinistryJoin from '@/components/MinistryJoin';
 import MinistryForm from '@/components/MinistryForm';
 
 interface Ministry {
@@ -224,6 +225,10 @@ const Ministries = () => {
                       <span>{ministry.leader_email}</span>
                     </div>
                   )}
+                  <MinistryJoin 
+                    ministryId={ministry.id} 
+                    ministryName={ministry.name} 
+                  />
                 </CardContent>
               </Card>
             ))}

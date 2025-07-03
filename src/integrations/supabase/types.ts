@@ -111,6 +111,41 @@ export type Database = {
         }
         Relationships: []
       }
+      event_registrations: {
+        Row: {
+          event_id: string
+          id: string
+          notes: string | null
+          registered_at: string
+          status: string
+          user_id: string
+        }
+        Insert: {
+          event_id: string
+          id?: string
+          notes?: string | null
+          registered_at?: string
+          status?: string
+          user_id: string
+        }
+        Update: {
+          event_id?: string
+          id?: string
+          notes?: string | null
+          registered_at?: string
+          status?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "event_registrations_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "events"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       events: {
         Row: {
           created_at: string
@@ -215,6 +250,41 @@ export type Database = {
           updated_at?: string
         }
         Relationships: []
+      }
+      ministry_memberships: {
+        Row: {
+          id: string
+          joined_at: string
+          ministry_id: string
+          role: string | null
+          status: string
+          user_id: string
+        }
+        Insert: {
+          id?: string
+          joined_at?: string
+          ministry_id: string
+          role?: string | null
+          status?: string
+          user_id: string
+        }
+        Update: {
+          id?: string
+          joined_at?: string
+          ministry_id?: string
+          role?: string | null
+          status?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ministry_memberships_ministry_id_fkey"
+            columns: ["ministry_id"]
+            isOneToOne: false
+            referencedRelation: "ministries"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       profiles: {
         Row: {

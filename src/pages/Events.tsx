@@ -9,6 +9,7 @@ import { Calendar, Clock, MapPin, Search, Filter, CalendarDays, Plus } from 'luc
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import EventForm from '@/components/EventForm';
+import EventRegistration from '@/components/EventRegistration';
 import { supabase } from '@/integrations/supabase/client';
 import { useUserRole } from '@/hooks/useUserRole';
 import { useToast } from '@/hooks/use-toast';
@@ -331,9 +332,10 @@ const Events = () => {
                       </div>
                     )}
 
-                    <Button className="w-full bg-bethel-blue hover:bg-bethel-navy">
-                      Ver Detalhes
-                    </Button>
+                    <EventRegistration 
+                      eventId={event.id} 
+                      eventTitle={event.title} 
+                    />
                   </CardContent>
                 </Card>
               ))}

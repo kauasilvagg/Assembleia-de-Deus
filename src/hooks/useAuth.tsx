@@ -1,4 +1,3 @@
-
 import { useState, useEffect, createContext, useContext } from 'react';
 import { User, Session, AuthChangeEvent } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
@@ -29,7 +28,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         setLoading(false);
 
         // Se o usuário acabou de se registrar, criar o role
-        if (event === 'SIGNED_UP' && session?.user) {
+        if (event === ('SIGNED_UP' as AuthChangeEvent) && session?.user) {
           console.log('User signed up, creating role...');
           const userType = session.user.user_metadata?.user_type || 'user';
           console.log('Creating role for user type:', userType);
