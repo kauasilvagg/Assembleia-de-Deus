@@ -45,29 +45,12 @@ const AdminRoleDebug = () => {
     if (!user) return;
 
     try {
-      // Primeiro, verificar se já existe um role
-      const { data: existingRole } = await supabase
-        .from('user_roles')
-        .select('*')
-        .eq('user_id', user.id)
-        .single();
+      // Usar a função do banco para promover o usuário
+      const { error } = await supabase.rpc('promote_user_to_admin', {
+        target_user_id: user.id
+      });
 
-      if (existingRole) {
-        // Atualizar role existente
-        const { error } = await supabase
-          .from('user_roles')
-          .update({ role: 'admin' })
-          .eq('user_id', user.id);
-
-        if (error) throw error;
-      } else {
-        // Criar novo role como admin
-        const { error } = await supabase
-          .from('user_roles')
-          .insert({ user_id: user.id, role: 'admin' });
-
-        if (error) throw error;
-      }
+      if (error) throw error;
 
       toast({
         title: "Sucesso",
@@ -79,11 +62,36 @@ const AdminRoleDebug = () => {
 
     } catch (error) {
       console.error('Erro ao promover usuário:', error);
-      toast({
-        title: "Erro",
-        description: "Não foi possível promover o usuário.",
-        variant: "destructive"
-      });
+      
+      // Fallback: tentar diretamente na tabela
+      try {
+        const { error: directError } = await supabase
+          .from('user_roles')
+          .upsert({ 
+            user_id: user.id, 
+            role: 'admin' 
+          }, {
+            onConflict: 'user_id'
+          });
+
+        if (directError) throw directError;
+
+        toast({
+          title: "Sucesso",
+          description: "Usuário promovido a administrador!"
+        });
+
+        await refreshRole();
+        await fetchDebugInfo();
+
+      } catch (fallbackError) {
+        console.error('Erro no fallback:', fallbackError);
+        toast({
+          title: "Erro",
+          description: "Não foi possível promover o usuário.",
+          variant: "destructive"
+        });
+      }
     }
   };
 

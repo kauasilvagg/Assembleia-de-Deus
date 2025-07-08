@@ -35,16 +35,15 @@ export const useUserRole = (): UserRoleHook => {
         .eq('user_id', user.id)
         .maybeSingle();
 
-      console.log('Role query result:', { data, error });
+      console.log('Role query result:', { data, error, userId: user.id });
 
       if (error) {
         console.error('Error fetching user role:', error);
         setUserRole('user'); // Fallback para user
       } else if (!data) {
-        // Usuário não tem role definido, tentar criar um
+        // Usuário não tem role definido, tentar criar um baseado nos metadados
         console.log('User has no role, attempting to create one...');
         
-        // Verificar se há informação do tipo de usuário nos metadados
         const userType = user.user_metadata?.user_type || 'user';
         console.log('Creating role based on user metadata:', userType);
         

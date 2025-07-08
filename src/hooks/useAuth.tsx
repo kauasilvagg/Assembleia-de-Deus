@@ -35,17 +35,28 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
           
           setTimeout(async () => {
             try {
-              const { error } = await supabase
+              // Verificar se já existe um role para este usuário
+              const { data: existingRole } = await supabase
                 .from('user_roles')
-                .insert({ 
-                  user_id: session.user.id, 
-                  role: userType as 'admin' | 'user'
-                });
-              
-              if (error) {
-                console.error('Error creating user role:', error);
+                .select('role')
+                .eq('user_id', session.user.id)
+                .single();
+
+              if (!existingRole) {
+                const { error } = await supabase
+                  .from('user_roles')
+                  .insert({ 
+                    user_id: session.user.id, 
+                    role: userType as 'admin' | 'user'
+                  });
+                
+                if (error) {
+                  console.error('Error creating user role:', error);
+                } else {
+                  console.log('User role created successfully as:', userType);
+                }
               } else {
-                console.log('User role created successfully as:', userType);
+                console.log('User role already exists:', existingRole.role);
               }
             } catch (error) {
               console.error('Exception creating user role:', error);
