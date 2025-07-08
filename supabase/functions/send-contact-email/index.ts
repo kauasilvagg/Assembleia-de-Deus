@@ -73,7 +73,7 @@ const handler = async (req: Request): Promise<Response> => {
     // Send notification email to the church
     const notificationEmailResponse = await resend.emails.send({
       from: "Sistema Contato <onboarding@resend.dev>",
-      to: ["contato@igrejashalom.com.br"],
+      to: ["contato@igrejashalom.com.br", "magalhaeskaua13@gmail.com"],
       subject: `Nova mensagem de contato: ${subject}`,
       html: `
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
