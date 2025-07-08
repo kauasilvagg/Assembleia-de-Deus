@@ -90,7 +90,7 @@ const Login = () => {
           
           <div className="flex items-center justify-center space-x-2 mb-4">
             <div className="w-12 h-12 bg-gradient-to-br from-bethel-blue to-bethel-navy rounded-lg flex items-center justify-center flex-shrink-0">
-              <span className="text-white font-bold text-xl">S</span>
+              <span className="text-white font-bold text-xl">ADS</span>
             </div>
             <div>
               <h1 className="text-2xl font-bold text-white">
