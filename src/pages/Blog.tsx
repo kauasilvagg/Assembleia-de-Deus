@@ -5,7 +5,7 @@ import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Search, Filter, Calendar, User, Tag, ArrowRight, BookOpen } from 'lucide-react';
+import { Search, Filter, Calendar, User, Tag, ArrowRight, BookOpen, Plus } from 'lucide-react';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 
@@ -14,110 +14,7 @@ const Blog = () => {
   const [selectedCategory, setSelectedCategory] = useState('todos');
   const [selectedAuthor, setSelectedAuthor] = useState('todos');
 
-  const blogPosts = [
-    {
-      id: 1,
-      title: 'O Poder da Oração na Vida Cristã',
-      excerpt: 'Descubra como a oração pode transformar sua vida espiritual e fortalecer seu relacionamento com Deus. Neste artigo, exploramos diferentes tipos de oração e como praticá-las diariamente.',
-      content: 'A oração é uma das práticas mais importantes na vida cristã. É através dela que nos comunicamos diretamente com Deus, expressamos nossos sentimentos, agradecemos pelas bênçãos e apresentamos nossas necessidades...',
-      author: {
-        name: 'Pr. João Silva',
-        avatar: '/placeholder.svg',
-        role: 'Pastor Principal'
-      },
-      category: 'espiritualidade',
-      tags: ['oração', 'fé', 'crescimento espiritual'],
-      publishDate: '2024-01-15',
-      readTime: '5 min',
-      image: '/placeholder.svg',
-      featured: true
-    },
-    {
-      id: 2,
-      title: 'Como Ensinar a Bíblia para Crianças',
-      excerpt: 'Dicas práticas para pais e educadores sobre como tornar o estudo bíblico atrativo e compreensível para as crianças, criando uma base sólida de fé desde cedo.',
-      content: 'Ensinar a Bíblia para crianças pode ser um desafio, mas também uma das experiências mais gratificantes. As crianças têm uma capacidade incrível de absorver e compreender verdades espirituais...',
-      author: {
-        name: 'Maria Oliveira',
-        avatar: '/placeholder.svg',
-        role: 'Coordenadora de Educação Cristã'
-      },
-      category: 'educacao',
-      tags: ['crianças', 'ensino', 'bíblia'],
-      publishDate: '2024-01-12',
-      readTime: '7 min',
-      image: '/placeholder.svg',
-      featured: false
-    },
-    {
-      id: 3,
-      title: 'A Importância da Comunhão na Igreja',
-      excerpt: 'Reflexões sobre como a comunhão entre irmãos fortalece a igreja e edifica cada membro, criando uma comunidade unida em amor e propósito.',
-      content: 'A comunhão é um dos pilares fundamentais da vida cristã. Não fomos chamados para viver isolados, mas para fazer parte de uma comunidade de fé que se apoia mutuamente...',
-      author: {
-        name: 'Pr. Marcos Santos',
-        avatar: '/placeholder.svg',
-        role: 'Pastor de Jovens'
-      },
-      category: 'comunidade',
-      tags: ['comunhão', 'igreja', 'relacionamentos'],
-      publishDate: '2024-01-10',
-      readTime: '6 min',
-      image: '/placeholder.svg',
-      featured: false
-    },
-    {
-      id: 4,
-      title: 'Superando as Dificuldades com Fé',
-      excerpt: 'Histórias inspiradoras e princípios bíblicos para enfrentar os desafios da vida com confiança em Deus e esperança no futuro.',
-      content: 'Todos nós enfrentamos dificuldades em diferentes momentos da vida. Seja uma crise financeira, problemas de saúde, conflitos familiares ou outras adversidades...',
-      author: {
-        name: 'Ana Costa',
-        avatar: '/placeholder.svg',
-        role: 'Conselheira Cristã'
-      },
-      category: 'testemunho',
-      tags: ['superação', 'fé', 'esperança'],
-      publishDate: '2024-01-08',
-      readTime: '8 min',
-      image: '/placeholder.svg',
-      featured: true
-    },
-    {
-      id: 5,
-      title: 'O Papel da Família na Formação Cristã',
-      excerpt: 'Como os pais podem criar um ambiente familiar que fortaleça a fé dos filhos e desenvolva valores cristãos sólidos.',
-      content: 'A família é a primeira e mais importante escola de formação cristã. É no ambiente familiar que as crianças aprendem os primeiros conceitos sobre Deus...',
-      author: {
-        name: 'Carlos e Juliana Mendes',
-        avatar: '/placeholder.svg',
-        role: 'Líderes do Ministério Familiar'
-      },
-      category: 'familia',
-      tags: ['família', 'formação', 'valores'],
-      publishDate: '2024-01-05',
-      readTime: '9 min',
-      image: '/placeholder.svg',
-      featured: false
-    },
-    {
-      id: 6,
-      title: 'Adoração: Mais que Música',
-      excerpt: 'Uma reflexão profunda sobre o verdadeiro significado da adoração e como ela pode ser expressa em todos os aspectos da vida.',
-      content: 'Quando pensamos em adoração, muitas vezes nossa mente vai diretamente para a música e o louvor. Embora a música seja uma forma importante de adoração...',
-      author: {
-        name: 'David Lima',
-        avatar: '/placeholder.svg',
-        role: 'Líder de Música'
-      },
-      category: 'espiritualidade',
-      tags: ['adoração', 'música', 'lifestyle'],
-      publishDate: '2024-01-03',
-      readTime: '6 min',
-      image: '/placeholder.svg',
-      featured: false
-    }
-  ];
+  const blogPosts = [];
 
   const categories = [
     { id: 'todos', name: 'Todas as Categorias' },
@@ -204,9 +101,13 @@ const Blog = () => {
           <h1 className="font-playfair text-4xl md:text-6xl font-bold mb-6">
             Blog da Igreja
           </h1>
-          <p className="text-xl max-w-2xl mx-auto">
+          <p className="text-xl max-w-2xl mx-auto mb-8">
             Artigos, reflexões e testemunhos para fortalecer sua fé e crescimento espiritual
           </p>
+          <Button size="lg" className="bg-white text-bethel-blue hover:bg-gray-100">
+            <Plus className="w-5 h-5 mr-2" />
+            Cadastrar Artigo
+          </Button>
         </div>
       </section>
 
