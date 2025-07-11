@@ -7,13 +7,15 @@ import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Settings, Users, Calendar, FileText, MessageSquare, BookOpen, Church } from 'lucide-react';
+import { Settings, Users, Calendar, FileText, MessageSquare, BookOpen, Church, BarChart3 } from 'lucide-react';
 import AdminRoleDebug from '@/components/AdminRoleDebug';
 import AdminUserManager from '@/components/AdminUserManager';
 import UserRoleManager from '@/components/UserRoleManager';
 import EventForm from '@/components/EventForm';
 import SermonForm from '@/components/SermonForm';
 import MinistryForm from '@/components/MinistryForm';
+import DashboardStats from '@/components/Dashboard/DashboardStats';
+import RecentActivity from '@/components/Dashboard/RecentActivity';
 
 const Admin = () => {
   const { user, loading: authLoading } = useAuth();
@@ -58,8 +60,12 @@ const Admin = () => {
 
         <AdminRoleDebug />
 
-        <Tabs defaultValue="users" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-6">
+        <Tabs defaultValue="dashboard" className="space-y-6">
+          <TabsList className="grid w-full grid-cols-7">
+            <TabsTrigger value="dashboard" className="flex items-center space-x-2">
+              <BarChart3 className="w-4 h-4" />
+              <span>Dashboard</span>
+            </TabsTrigger>
             <TabsTrigger value="users" className="flex items-center space-x-2">
               <Users className="w-4 h-4" />
               <span>Usuários</span>
@@ -85,6 +91,11 @@ const Admin = () => {
               <span>Config</span>
             </TabsTrigger>
           </TabsList>
+
+          <TabsContent value="dashboard" className="space-y-6">
+            <DashboardStats />
+            <RecentActivity />
+          </TabsContent>
 
           <TabsContent value="users" className="space-y-6">
             <AdminUserManager />

@@ -15,6 +15,7 @@ import About from "./pages/About";
 import Ministries from "./pages/Ministries";
 import Sermons from "./pages/Sermons";
 import Contact from "./pages/Contact";
+import Members from "./pages/Members";
 
 const queryClient = new QueryClient();
 
@@ -34,6 +35,7 @@ const App = () => (
             <Route path="/sobre" element={<About />} />
             <Route path="/ministerios" element={<Ministries />} />
             <Route path="/sermoes" element={<Sermons />} />
+            <Route path="/membros" element={<Members />} />
             <Route path="/contato" element={<Contact />} />
             {/* Catch-all route */}
             <Route path="*" element={<NotFound />} />
