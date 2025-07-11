@@ -16,6 +16,7 @@ import Ministries from "./pages/Ministries";
 import Sermons from "./pages/Sermons";
 import Contact from "./pages/Contact";
 import Members from "./pages/Members";
+import Donations from "./pages/Donations";
 
 const queryClient = new QueryClient();
 
@@ -36,6 +37,7 @@ const App = () => (
             <Route path="/ministerios" element={<Ministries />} />
             <Route path="/sermoes" element={<Sermons />} />
             <Route path="/membros" element={<Members />} />
+            <Route path="/doacoes" element={<Donations />} />
             <Route path="/contato" element={<Contact />} />
             {/* Catch-all route */}
             <Route path="*" element={<NotFound />} />
