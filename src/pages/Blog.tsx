@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -8,13 +8,76 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Search, Filter, Calendar, User, Tag, ArrowRight, BookOpen, Plus } from 'lucide-react';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
+import { useAuth } from '@/hooks/useAuth';
+import { useUserRole } from '@/hooks/useUserRole';
+import { supabase } from '@/integrations/supabase/client';
+import { useToast } from '@/hooks/use-toast';
+import { useNavigate } from 'react-router-dom';
 
 const Blog = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('todos');
   const [selectedAuthor, setSelectedAuthor] = useState('todos');
+  const [blogPosts, setBlogPosts] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  const blogPosts = [];
+  const { user } = useAuth();
+  const { isAdmin } = useUserRole();
+  const { toast } = useToast();
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    fetchBlogPosts();
+  }, []);
+
+  const fetchBlogPosts = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('blog_posts')
+        .select('*')
+        .eq('is_published', true)
+        .order('created_at', { ascending: false });
+
+      if (error) throw error;
+      setBlogPosts(data || []);
+    } catch (error) {
+      console.error('Erro ao buscar posts:', error);
+      toast({
+        title: "Erro",
+        description: "Não foi possível carregar os artigos do blog",
+        variant: "destructive",
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleCreateArticle = () => {
+    if (!user) {
+      toast({
+        title: "Login necessário",
+        description: "Você precisa fazer login para cadastrar artigos",
+        variant: "destructive",
+      });
+      navigate('/login');
+      return;
+    }
+
+    if (!isAdmin) {
+      toast({
+        title: "Acesso negado",
+        description: "Apenas administradores podem cadastrar artigos",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    // TODO: Navegar para página de criação de artigo
+    toast({
+      title: "Em desenvolvimento",
+      description: "A página de criação de artigos está sendo desenvolvida",
+    });
+  };
 
   const categories = [
     { id: 'todos', name: 'Todas as Categorias' },
@@ -80,15 +143,15 @@ const Blog = () => {
 
   const filteredPosts = blogPosts.filter(post => {
     const matchesSearch = post.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         post.excerpt.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         (post.excerpt || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
                          post.content.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesCategory = selectedCategory === 'todos' || post.category === selectedCategory;
-    const matchesAuthor = selectedAuthor === 'todos' || post.author.name === selectedAuthor;
+    const matchesAuthor = selectedAuthor === 'todos' || post.author_name === selectedAuthor;
     
     return matchesSearch && matchesCategory && matchesAuthor;
   });
 
-  const featuredPosts = blogPosts.filter(post => post.featured);
+  const featuredPosts = blogPosts.filter(post => post.is_featured);
   const recentPosts = blogPosts.slice(0, 3);
 
   return (
@@ -104,7 +167,11 @@ const Blog = () => {
           <p className="text-xl max-w-2xl mx-auto mb-8">
             Artigos, reflexões e testemunhos para fortalecer sua fé e crescimento espiritual
           </p>
-          <Button size="lg" className="bg-white text-bethel-blue hover:bg-gray-100">
+          <Button 
+            size="lg" 
+            className="bg-white text-bethel-blue hover:bg-gray-100"
+            onClick={handleCreateArticle}
+          >
             <Plus className="w-5 h-5 mr-2" />
             Cadastrar Artigo
           </Button>
@@ -234,7 +301,12 @@ const Blog = () => {
       {/* Blog Posts Grid */}
       <section className="py-16">
         <div className="container mx-auto px-4">
-          {filteredPosts.length === 0 ? (
+          {loading ? (
+            <div className="text-center py-12">
+              <BookOpen className="w-16 h-16 text-gray-400 mx-auto mb-4 animate-pulse" />
+              <h3 className="text-xl font-semibold text-gray-600 mb-2">Carregando artigos...</h3>
+            </div>
+          ) : filteredPosts.length === 0 ? (
             <div className="text-center py-12">
               <BookOpen className="w-16 h-16 text-gray-400 mx-auto mb-4" />
               <h3 className="text-xl font-semibold text-gray-600 mb-2">Nenhum artigo encontrado</h3>
@@ -245,14 +317,17 @@ const Blog = () => {
               {filteredPosts.map((post, index) => (
                 <Card key={post.id} className="overflow-hidden hover:shadow-xl transition-all duration-300 animate-fade-in" style={{ animationDelay: `${index * 0.1}s` }}>
                   <div className="aspect-video bg-gradient-to-br from-bethel-blue to-bethel-navy relative">
-                    <img 
-                      src={post.image} 
-                      alt={post.title}
-                      className="w-full h-full object-cover opacity-20"
-                    />
-                    <div className="absolute inset-0 flex items-center justify-center">
-                      <BookOpen className="w-8 h-8 text-white" />
-                    </div>
+                    {post.featured_image_url ? (
+                      <img 
+                        src={post.featured_image_url} 
+                        alt={post.title}
+                        className="w-full h-full object-cover opacity-80"
+                      />
+                    ) : (
+                      <div className="absolute inset-0 flex items-center justify-center">
+                        <BookOpen className="w-8 h-8 text-white" />
+                      </div>
+                    )}
                   </div>
                   
                   <CardContent className="p-6">
@@ -260,7 +335,6 @@ const Blog = () => {
                       <Badge className={`${getCategoryColor(post.category)} border-0`}>
                         {getCategoryLabel(post.category)}
                       </Badge>
-                      <span className="text-sm text-gray-500">{post.readTime}</span>
                     </div>
                     
                     <h3 className="text-lg font-semibold text-gray-900 mb-3 line-clamp-2">
@@ -268,23 +342,22 @@ const Blog = () => {
                     </h3>
                     
                     <p className="text-gray-600 text-sm mb-4 line-clamp-3">
-                      {post.excerpt}
+                      {post.excerpt || post.content.substring(0, 150) + '...'}
                     </p>
                     
                     <div className="flex items-center justify-between mb-4">
                       <div className="flex items-center gap-2 text-sm text-gray-500">
                         <Calendar className="w-4 h-4" />
-                        {formatDate(post.publishDate)}
+                        {formatDate(post.created_at)}
                       </div>
                     </div>
                     
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-2">
                         <Avatar className="w-6 h-6">
-                          <AvatarImage src={post.author.avatar} />
-                          <AvatarFallback className="text-xs">{post.author.name.charAt(0)}</AvatarFallback>
+                          <AvatarFallback className="text-xs">{post.author_name.charAt(0)}</AvatarFallback>
                         </Avatar>
-                        <span className="text-sm font-medium text-gray-900">{post.author.name}</span>
+                        <span className="text-sm font-medium text-gray-900">{post.author_name}</span>
                       </div>
                       
                       <Button variant="ghost" size="sm" className="text-bethel-blue hover:text-bethel-navy">

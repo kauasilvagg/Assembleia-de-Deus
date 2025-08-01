@@ -7,12 +7,13 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Checkbox } from '@/components/ui/checkbox';
 import { Textarea } from '@/components/ui/textarea';
 import { Badge } from '@/components/ui/badge';
-import { Heart, CreditCard, DollarSign, Calendar, Gift, Church } from 'lucide-react';
+import { Heart, CreditCard, DollarSign, Calendar, Gift, Church, LogIn } from 'lucide-react';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/hooks/useAuth';
+import { useNavigate } from 'react-router-dom';
 
 const Donations = () => {
   const [amount, setAmount] = useState('');
@@ -23,17 +24,23 @@ const Donations = () => {
   const [notes, setNotes] = useState('');
   const [loading, setLoading] = useState(false);
   const [campaigns, setCampaigns] = useState<any[]>([]);
+  const [userDonations, setUserDonations] = useState<any[]>([]);
+  const [loadingDonations, setLoadingDonations] = useState(false);
   
   const { toast } = useToast();
   const { user } = useAuth();
+  const navigate = useNavigate();
 
   useEffect(() => {
     fetchActiveCampaigns();
-  }, []);
+    if (user) {
+      fetchUserDonations();
+    }
+  }, [user]);
 
   const fetchActiveCampaigns = async () => {
     try {
-      // Buscar campanhas ativas (você pode criar uma tabela de campanhas)
+      // Por enquanto usando dados fictícios, mas pode ser conectado a uma tabela de campanhas
       setCampaigns([
         { id: '1', name: 'Construção do Novo Templo', target: 500000, raised: 150000 },
         { id: '2', name: 'Missão África', target: 100000, raised: 25000 },
@@ -44,7 +51,46 @@ const Donations = () => {
     }
   };
 
+  const fetchUserDonations = async () => {
+    if (!user) return;
+    
+    setLoadingDonations(true);
+    try {
+      // Buscar o membro do usuário logado
+      const { data: member } = await supabase
+        .from('members')
+        .select('id')
+        .eq('user_id', user.id)
+        .single();
+
+      if (member) {
+        const { data: donations, error } = await supabase
+          .from('donations')
+          .select('*')
+          .eq('member_id', member.id)
+          .order('created_at', { ascending: false });
+
+        if (error) throw error;
+        setUserDonations(donations || []);
+      }
+    } catch (error) {
+      console.error('Erro ao buscar doações do usuário:', error);
+    } finally {
+      setLoadingDonations(false);
+    }
+  };
+
   const handleStripePayment = async () => {
+    if (!user) {
+      toast({
+        title: "Login necessário",
+        description: "Você precisa fazer login para fazer uma doação",
+        variant: "destructive",
+      });
+      navigate('/login');
+      return;
+    }
+
     if (!amount || parseFloat(amount) <= 0) {
       toast({
         title: "Erro",
@@ -57,35 +103,56 @@ const Donations = () => {
     setLoading(true);
     
     try {
-      // Criar sessão do Stripe
-      const response = await fetch('/api/create-donation-session', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          amount: parseFloat(amount) * 100, // Stripe usa centavos
-          donationType,
-          isRecurring,
-          recurringFrequency: isRecurring ? recurringFrequency : null,
-          campaignName: donationType === 'campaign' ? campaignName : null,
+      // Primeiro registrar a doação no banco de dados
+      const { data: member } = await supabase
+        .from('members')
+        .select('id')
+        .eq('user_id', user.id)
+        .single();
+
+      if (!member) {
+        toast({
+          title: "Erro",
+          description: "Perfil de membro não encontrado. Entre em contato com a administração.",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      const { data: donation, error } = await supabase
+        .from('donations')
+        .insert({
+          member_id: member.id,
+          amount: parseFloat(amount),
+          donation_type: donationType,
+          is_recurring: isRecurring,
+          recurring_frequency: isRecurring ? recurringFrequency : null,
+          campaign_name: donationType === 'campaign' ? campaignName : null,
           notes,
-          userId: user?.id
-        }),
+          payment_method: 'stripe'
+        })
+        .select()
+        .single();
+
+      if (error) throw error;
+
+      toast({
+        title: "Doação registrada!",
+        description: `Doação de ${formatCurrency(parseFloat(amount))} registrada com sucesso. Em breve você será redirecionado para o pagamento.`,
       });
 
-      const session = await response.json();
-      
-      if (session.url) {
-        // Abrir Stripe Checkout em nova aba
-        window.open(session.url, '_blank');
-      }
+      // Atualizar a lista de doações
+      fetchUserDonations();
+
+      // Limpar formulário
+      setAmount('');
+      setNotes('');
       
     } catch (error) {
       console.error('Erro ao processar doação:', error);
       toast({
         title: "Erro",
-        description: "Erro ao processar doação",
+        description: "Erro ao registrar doação no banco de dados",
         variant: "destructive",
       });
     } finally {
@@ -129,6 +196,24 @@ const Donations = () => {
       </section>
 
       <div className="container mx-auto px-4 py-12">
+        {!user && (
+          <div className="mb-8 p-6 bg-yellow-50 border border-yellow-200 rounded-lg">
+            <div className="flex items-center gap-3">
+              <LogIn className="w-5 h-5 text-yellow-600" />
+              <div>
+                <h3 className="font-semibold text-yellow-800">Login Necessário</h3>
+                <p className="text-yellow-700">Para fazer doações, você precisa estar logado no sistema.</p>
+                <Button 
+                  onClick={() => navigate('/login')} 
+                  className="mt-3 bg-yellow-600 hover:bg-yellow-700"
+                >
+                  Fazer Login
+                </Button>
+              </div>
+            </div>
+          </div>
+        )}
+
         <div className="grid lg:grid-cols-3 gap-8">
           {/* Formulário de Doação */}
           <div className="lg:col-span-2">
@@ -256,28 +341,78 @@ const Donations = () => {
                 {/* Botão de Doação */}
                 <Button
                   onClick={handleStripePayment}
-                  disabled={loading || !amount}
+                  disabled={loading || !amount || !user}
                   className="w-full bg-bethel-blue hover:bg-bethel-navy text-lg py-6"
                 >
                   {loading ? (
                     'Processando...'
+                  ) : !user ? (
+                    <>
+                      <LogIn className="w-5 h-5 mr-2" />
+                      Fazer Login para Doar
+                    </>
                   ) : (
                     <>
                       <Heart className="w-5 h-5 mr-2" />
-                      Doar {amount && formatCurrency(parseFloat(amount))}
+                      Registrar Doação {amount && formatCurrency(parseFloat(amount))}
                     </>
                   )}
                 </Button>
 
                 <p className="text-sm text-gray-600 text-center">
-                  Pagamento seguro processado pelo Stripe. Você será redirecionado para completar o pagamento.
+                  {user ? 
+                    'A doação será registrada no sistema. O pagamento via Stripe será implementado em breve.' :
+                    'Faça login para registrar suas doações no sistema.'
+                  }
                 </p>
               </CardContent>
             </Card>
           </div>
 
-          {/* Campanhas Ativas */}
+          {/* Campanhas e Doações do Usuário */}
           <div className="space-y-6">
+            {/* Minhas Doações - só mostra se estiver logado */}
+            {user && (
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Heart className="w-5 h-5" />
+                    Minhas Doações
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  {loadingDonations ? (
+                    <p className="text-center text-gray-500">Carregando...</p>
+                  ) : userDonations.length === 0 ? (
+                    <p className="text-center text-gray-500">Você ainda não fez nenhuma doação.</p>
+                  ) : (
+                    <div className="space-y-3">
+                      {userDonations.slice(0, 3).map((donation) => (
+                        <div key={donation.id} className="flex justify-between items-center p-3 bg-gray-50 rounded">
+                          <div>
+                            <p className="font-medium">{formatCurrency(donation.amount)}</p>
+                            <p className="text-sm text-gray-600">
+                              {donation.donation_type === 'tithe' && 'Dízimo'}
+                              {donation.donation_type === 'offering' && 'Oferta'}
+                              {donation.donation_type === 'campaign' && donation.campaign_name}
+                              {donation.donation_type === 'mission' && 'Missões'}
+                            </p>
+                          </div>
+                          <span className="text-sm text-gray-500">
+                            {new Date(donation.created_at).toLocaleDateString('pt-BR')}
+                          </span>
+                        </div>
+                      ))}
+                      {userDonations.length > 3 && (
+                        <p className="text-sm text-gray-600 text-center">
+                          E mais {userDonations.length - 3} doações...
+                        </p>
+                      )}
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+            )}
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
