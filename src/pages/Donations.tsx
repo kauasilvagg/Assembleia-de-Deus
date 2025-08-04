@@ -100,59 +100,44 @@ const Donations = () => {
       return;
     }
 
+    if (donationType === 'campaign' && !campaignName) {
+      toast({
+        title: "Erro",
+        description: "Por favor, selecione uma campanha",
+        variant: "destructive",
+      });
+      return;
+    }
+
     setLoading(true);
     
     try {
-      // Primeiro registrar a doação no banco de dados
-      const { data: member } = await supabase
-        .from('members')
-        .select('id')
-        .eq('user_id', user.id)
-        .single();
-
-      if (!member) {
-        toast({
-          title: "Erro",
-          description: "Perfil de membro não encontrado. Entre em contato com a administração.",
-          variant: "destructive",
-        });
-        return;
-      }
-
-      const { data: donation, error } = await supabase
-        .from('donations')
-        .insert({
-          member_id: member.id,
+      // Chamar edge function para criar sessão de pagamento Stripe
+      const { data, error } = await supabase.functions.invoke('create-donation-payment', {
+        body: {
           amount: parseFloat(amount),
-          donation_type: donationType,
-          is_recurring: isRecurring,
-          recurring_frequency: isRecurring ? recurringFrequency : null,
-          campaign_name: donationType === 'campaign' ? campaignName : null,
-          notes,
-          payment_method: 'stripe'
-        })
-        .select()
-        .single();
+          donationType,
+          isRecurring,
+          recurringFrequency,
+          campaignName,
+          notes
+        }
+      });
 
       if (error) throw error;
 
-      toast({
-        title: "Doação registrada!",
-        description: `Doação de ${formatCurrency(parseFloat(amount))} registrada com sucesso. Em breve você será redirecionado para o pagamento.`,
-      });
-
-      // Atualizar a lista de doações
-      fetchUserDonations();
-
-      // Limpar formulário
-      setAmount('');
-      setNotes('');
+      if (data?.url) {
+        // Redirecionar para o checkout do Stripe
+        window.location.href = data.url;
+      } else {
+        throw new Error('URL de pagamento não recebida');
+      }
       
     } catch (error) {
       console.error('Erro ao processar doação:', error);
       toast({
         title: "Erro",
-        description: "Erro ao registrar doação no banco de dados",
+        description: "Erro ao processar pagamento. Tente novamente.",
         variant: "destructive",
       });
     } finally {
@@ -361,7 +346,7 @@ const Donations = () => {
 
                 <p className="text-sm text-gray-600 text-center">
                   {user ? 
-                    'A doação será registrada no sistema. O pagamento via Stripe será implementado em breve.' :
+                    'Clique para prosseguir para o pagamento seguro via Stripe.' :
                     'Faça login para registrar suas doações no sistema.'
                   }
                 </p>
