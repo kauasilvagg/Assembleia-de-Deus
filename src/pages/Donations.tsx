@@ -40,12 +40,8 @@ const Donations = () => {
 
   const fetchActiveCampaigns = async () => {
     try {
-      // Por enquanto usando dados fictícios, mas pode ser conectado a uma tabela de campanhas
-      setCampaigns([
-        { id: '1', name: 'Construção do Novo Templo', target: 500000, raised: 150000 },
-        { id: '2', name: 'Missão África', target: 100000, raised: 25000 },
-        { id: '3', name: 'Reforma do Salão Infantil', target: 50000, raised: 30000 }
-      ]);
+      // Campanhas serão implementadas posteriormente
+      setCampaigns([]);
     } catch (error) {
       console.error('Erro ao buscar campanhas:', error);
     }
@@ -100,10 +96,10 @@ const Donations = () => {
       return;
     }
 
-    if (donationType === 'campaign' && !campaignName) {
+    if (donationType === 'campaign' && campaigns.length === 0) {
       toast({
         title: "Erro",
-        description: "Por favor, selecione uma campanha",
+        description: "Não há campanhas ativas no momento",
         variant: "destructive",
       });
       return;
@@ -230,8 +226,8 @@ const Donations = () => {
                   </Select>
                 </div>
 
-                {/* Campanha específica */}
-                {donationType === 'campaign' && (
+                {/* Campanha específica - Oculto já que não há campanhas ativas */}
+                {donationType === 'campaign' && campaigns.length > 0 && (
                   <div className="space-y-2">
                     <Label>Escolha a Campanha</Label>
                     <Select value={campaignName} onValueChange={setCampaignName}>
@@ -246,6 +242,15 @@ const Donations = () => {
                         ))}
                       </SelectContent>
                     </Select>
+                  </div>
+                )}
+                
+                {/* Aviso quando campanha selecionada mas não há campanhas */}
+                {donationType === 'campaign' && campaigns.length === 0 && (
+                  <div className="p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
+                    <p className="text-sm text-yellow-700">
+                      Não há campanhas ativas no momento. Selecione outro tipo de doação.
+                    </p>
                   </div>
                 )}
 
@@ -406,46 +411,55 @@ const Donations = () => {
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
-                {campaigns.map((campaign) => (
-                  <div key={campaign.id} className="border rounded-lg p-4">
-                    <h3 className="font-semibold mb-2">{campaign.name}</h3>
-                    
-                    <div className="space-y-2">
-                      <div className="flex justify-between text-sm">
-                        <span>Arrecadado:</span>
-                        <span className="font-medium">{formatCurrency(campaign.raised)}</span>
-                      </div>
-                      <div className="flex justify-between text-sm">
-                        <span>Meta:</span>
-                        <span>{formatCurrency(campaign.target)}</span>
-                      </div>
-                    </div>
-                    
-                    <div className="mt-3">
-                      <div className="w-full bg-gray-200 rounded-full h-2">
-                        <div
-                          className="bg-bethel-blue h-2 rounded-full transition-all duration-300"
-                          style={{ width: `${getProgress(campaign.raised, campaign.target)}%` }}
-                        />
-                      </div>
-                      <p className="text-sm text-gray-600 mt-1">
-                        {getProgress(campaign.raised, campaign.target).toFixed(1)}% da meta
-                      </p>
-                    </div>
-                    
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      className="w-full mt-3"
-                      onClick={() => {
-                        setDonationType('campaign');
-                        setCampaignName(campaign.name);
-                      }}
-                    >
-                      Apoiar esta Campanha
-                    </Button>
+                {campaigns.length === 0 ? (
+                  <div className="text-center py-6">
+                    <p className="text-gray-500 mb-2">Não há campanhas ativas no momento</p>
+                    <p className="text-sm text-gray-400">
+                      Novas campanhas serão exibidas aqui quando disponíveis
+                    </p>
                   </div>
-                ))}
+                ) : (
+                  campaigns.map((campaign) => (
+                    <div key={campaign.id} className="border rounded-lg p-4">
+                      <h3 className="font-semibold mb-2">{campaign.name}</h3>
+                      
+                      <div className="space-y-2">
+                        <div className="flex justify-between text-sm">
+                          <span>Arrecadado:</span>
+                          <span className="font-medium">{formatCurrency(campaign.raised)}</span>
+                        </div>
+                        <div className="flex justify-between text-sm">
+                          <span>Meta:</span>
+                          <span>{formatCurrency(campaign.target)}</span>
+                        </div>
+                      </div>
+                      
+                      <div className="mt-3">
+                        <div className="w-full bg-gray-200 rounded-full h-2">
+                          <div
+                            className="bg-bethel-blue h-2 rounded-full transition-all duration-300"
+                            style={{ width: `${getProgress(campaign.raised, campaign.target)}%` }}
+                          />
+                        </div>
+                        <p className="text-sm text-gray-600 mt-1">
+                          {getProgress(campaign.raised, campaign.target).toFixed(1)}% da meta
+                        </p>
+                      </div>
+                      
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="w-full mt-3"
+                        onClick={() => {
+                          setDonationType('campaign');
+                          setCampaignName(campaign.name);
+                        }}
+                      >
+                        Apoiar esta Campanha
+                      </Button>
+                    </div>
+                  ))
+                )}
               </CardContent>
             </Card>
 
