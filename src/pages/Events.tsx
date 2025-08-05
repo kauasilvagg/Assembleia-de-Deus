@@ -5,11 +5,12 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Calendar, Clock, MapPin, Search, Filter, CalendarDays, Plus } from 'lucide-react';
+import { Calendar, Clock, MapPin, Search, Filter, CalendarDays, Plus, CreditCard } from 'lucide-react';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import EventForm from '@/components/EventForm';
 import EventRegistration from '@/components/EventRegistration';
+import EventPayment from '@/components/EventPayment';
 import { supabase } from '@/integrations/supabase/client';
 import { useUserRole } from '@/hooks/useUserRole';
 import { useToast } from '@/hooks/use-toast';
@@ -25,6 +26,8 @@ interface Event {
   registration_required: boolean | null;
   max_participants: number | null;
   is_active: boolean | null;
+  price: number;
+  is_paid: boolean;
 }
 
 const Events = () => {
@@ -34,6 +37,7 @@ const Events = () => {
   const [showEventForm, setShowEventForm] = useState(false);
   const [events, setEvents] = useState<Event[]>([]);
   const [loading, setLoading] = useState(true);
+  const [selectedEventForPayment, setSelectedEventForPayment] = useState<Event | null>(null);
   const { isAdmin } = useUserRole();
   const { toast } = useToast();
 
@@ -332,10 +336,20 @@ const Events = () => {
                       </div>
                     )}
 
-                    <EventRegistration 
-                      eventId={event.id} 
-                      eventTitle={event.title} 
-                    />
+                    {event.is_paid && event.price > 0 ? (
+                      <Button 
+                        onClick={() => setSelectedEventForPayment(event)}
+                        className="w-full bg-bethel-blue hover:bg-bethel-navy"
+                      >
+                        <CreditCard className="w-4 h-4 mr-2" />
+                        Inscrever-se - R$ {event.price.toFixed(2)}
+                      </Button>
+                    ) : (
+                      <EventRegistration 
+                        eventId={event.id} 
+                        eventTitle={event.title} 
+                      />
+                    )}
                   </CardContent>
                 </Card>
               ))}
@@ -395,6 +409,15 @@ const Events = () => {
         <EventForm 
           onClose={() => setShowEventForm(false)}
           onSuccess={handleEventFormSuccess}
+        />
+      )}
+
+      {/* Event Payment Modal */}
+      {selectedEventForPayment && (
+        <EventPayment
+          event={selectedEventForPayment}
+          isOpen={!!selectedEventForPayment}
+          onClose={() => setSelectedEventForPayment(null)}
         />
       )}
 

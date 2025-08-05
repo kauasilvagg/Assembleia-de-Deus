@@ -11,6 +11,7 @@ import Admin from "./pages/Admin";
 import NotFound from "./pages/NotFound";
 import Events from "./pages/Events";
 import Blog from "./pages/Blog";
+import BlogArticle from "./pages/BlogArticle";
 import About from "./pages/About";
 import Ministries from "./pages/Ministries";
 import Sermons from "./pages/Sermons";
@@ -33,6 +34,7 @@ const App = () => (
             <Route path="/admin" element={<Admin />} />
             <Route path="/eventos" element={<Events />} />
             <Route path="/blog" element={<Blog />} />
+            <Route path="/blog/:slug" element={<BlogArticle />} />
             <Route path="/sobre" element={<About />} />
             <Route path="/ministerios" element={<Ministries />} />
             <Route path="/sermoes" element={<Sermons />} />

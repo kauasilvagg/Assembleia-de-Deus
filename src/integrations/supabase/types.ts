@@ -10,7 +10,7 @@ export type Database = {
   // Allows to automatically instanciate createClient with right options
   // instead of createClient<Database, { PostgrestVersion: 'XX' }>(URL, KEY)
   __InternalSupabase: {
-    PostgrestVersion: "12.2.3 (519615d)"
+    PostgrestVersion: "12.2.12 (cd3cf9e)"
   }
   public: {
     Tables: {
@@ -27,6 +27,8 @@ export type Database = {
           is_featured: boolean | null
           is_published: boolean | null
           published_at: string | null
+          read_time: number | null
+          slug: string | null
           tags: string[] | null
           title: string
           updated_at: string
@@ -44,6 +46,8 @@ export type Database = {
           is_featured?: boolean | null
           is_published?: boolean | null
           published_at?: string | null
+          read_time?: number | null
+          slug?: string | null
           tags?: string[] | null
           title: string
           updated_at?: string
@@ -61,6 +65,8 @@ export type Database = {
           is_featured?: boolean | null
           is_published?: boolean | null
           published_at?: string | null
+          read_time?: number | null
+          slug?: string | null
           tags?: string[] | null
           title?: string
           updated_at?: string
@@ -534,9 +540,11 @@ export type Database = {
           id: string
           image_url: string | null
           is_active: boolean | null
+          is_paid: boolean | null
           is_recurring: boolean | null
           location: string | null
           max_participants: number | null
+          price: number | null
           recurring_pattern: string | null
           registration_required: boolean | null
           title: string
@@ -552,9 +560,11 @@ export type Database = {
           id?: string
           image_url?: string | null
           is_active?: boolean | null
+          is_paid?: boolean | null
           is_recurring?: boolean | null
           location?: string | null
           max_participants?: number | null
+          price?: number | null
           recurring_pattern?: string | null
           registration_required?: boolean | null
           title: string
@@ -570,9 +580,11 @@ export type Database = {
           id?: string
           image_url?: string | null
           is_active?: boolean | null
+          is_paid?: boolean | null
           is_recurring?: boolean | null
           location?: string | null
           max_participants?: number | null
+          price?: number | null
           recurring_pattern?: string | null
           registration_required?: boolean | null
           title?: string
@@ -943,6 +955,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      generate_slug: {
+        Args: { title: string }
+        Returns: string
+      }
       has_role: {
         Args: {
           _user_id: string

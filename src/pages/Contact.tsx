@@ -119,7 +119,7 @@ const Contact = () => {
                   <Phone className="w-5 h-5 text-bethel-blue mt-1" />
                   <div>
                     <h4 className="font-semibold text-gray-900">Telefone</h4>
-                    <p className="text-gray-600">(98) 1234-5678</p>
+                    <p className="text-gray-600">(98) 985122030</p>
                   </div>
                 </div>
 
@@ -127,19 +127,7 @@ const Contact = () => {
                   <Mail className="w-5 h-5 text-bethel-blue mt-1" />
                   <div>
                     <h4 className="font-semibold text-gray-900">E-mail</h4>
-                    <p className="text-gray-600">contato@igrejashalom.com.br</p>
-                  </div>
-                </div>
-
-                <div className="flex items-start space-x-3">
-                  <Clock className="w-5 h-5 text-bethel-blue mt-1" />
-                  <div>
-                    <h4 className="font-semibold text-gray-900">Horários de Funcionamento</h4>
-                    <div className="text-gray-600 space-y-1">
-                      <p>Segunda a Sexta: 9h às 17h</p>
-                      <p>Sábado: 9h às 12h</p>
-                      <p>Domingo: Após os cultos</p>
-                    </div>
+                    <p className="text-gray-600">magalhaeskaua13@gmail.com</p>
                   </div>
                 </div>
               </CardContent>
@@ -153,12 +141,8 @@ const Contact = () => {
               </CardHeader>
               <CardContent className="space-y-2">
                 <div className="flex justify-between">
-                  <span className="font-medium">Domingo (Manhã)</span>
-                  <span>8h00</span>
-                </div>
-                <div className="flex justify-between">
                   <span className="font-medium">Domingo (Noite)</span>
-                  <span>19h00</span>
+                  <span>18h30</span>
                 </div>
               </CardContent>
             </Card>

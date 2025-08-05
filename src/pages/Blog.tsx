@@ -8,6 +8,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Search, Filter, Calendar, User, Tag, ArrowRight, BookOpen, Plus } from 'lucide-react';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
+import BlogForm from '@/components/BlogForm';
 import { useAuth } from '@/hooks/useAuth';
 import { useUserRole } from '@/hooks/useUserRole';
 import { supabase } from '@/integrations/supabase/client';
@@ -20,6 +21,7 @@ const Blog = () => {
   const [selectedAuthor, setSelectedAuthor] = useState('todos');
   const [blogPosts, setBlogPosts] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [showBlogForm, setShowBlogForm] = useState(false);
 
   const { user } = useAuth();
   const { isAdmin } = useUserRole();
@@ -72,11 +74,11 @@ const Blog = () => {
       return;
     }
 
-    // TODO: Navegar para página de criação de artigo
-    toast({
-      title: "Em desenvolvimento",
-      description: "A página de criação de artigos está sendo desenvolvida",
-    });
+    setShowBlogForm(true);
+  };
+
+  const handleBlogFormSuccess = () => {
+    fetchBlogPosts();
   };
 
   const categories = [
@@ -360,7 +362,12 @@ const Blog = () => {
                         <span className="text-sm font-medium text-gray-900">{post.author_name}</span>
                       </div>
                       
-                      <Button variant="ghost" size="sm" className="text-bethel-blue hover:text-bethel-navy">
+                      <Button 
+                        variant="ghost" 
+                        size="sm" 
+                        className="text-bethel-blue hover:text-bethel-navy"
+                        onClick={() => navigate(`/blog/${post.slug}`)}
+                      >
                         Ler mais <ArrowRight className="w-4 h-4 ml-1" />
                       </Button>
                     </div>

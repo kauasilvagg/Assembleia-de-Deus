@@ -11,6 +11,7 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '
 import { Checkbox } from '@/components/ui/checkbox';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
+import { Switch } from '@/components/ui/switch';
 import { Calendar, Clock, MapPin, X } from 'lucide-react';
 
 const eventFormSchema = z.object({
@@ -23,6 +24,8 @@ const eventFormSchema = z.object({
   recurring_pattern: z.string().optional(),
   registration_required: z.boolean().default(false),
   max_participants: z.number().optional(),
+  price: z.coerce.number().min(0, 'Preço deve ser maior ou igual a zero').optional(),
+  is_paid: z.boolean().default(false),
 });
 
 type EventFormData = z.infer<typeof eventFormSchema>;
@@ -48,6 +51,8 @@ const EventForm = ({ onClose, onSuccess }: EventFormProps) => {
       recurring_pattern: '',
       registration_required: false,
       max_participants: undefined,
+      price: 0,
+      is_paid: false,
     },
   });
 
@@ -69,6 +74,8 @@ const EventForm = ({ onClose, onSuccess }: EventFormProps) => {
         recurring_pattern: data.is_recurring ? data.recurring_pattern : null,
         registration_required: data.registration_required,
         max_participants: data.max_participants || null,
+        price: data.is_paid ? (data.price || 0) : 0,
+        is_paid: data.is_paid,
         is_active: true,
       };
 
@@ -275,6 +282,49 @@ const EventForm = ({ onClose, onSuccess }: EventFormProps) => {
                         placeholder="Ex: 100"
                         {...field}
                         onChange={(e) => field.onChange(e.target.value ? parseInt(e.target.value) : undefined)}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            )}
+
+            <div className="flex items-center space-x-2">
+              <FormField
+                control={form.control}
+                name="is_paid"
+                render={({ field }) => (
+                  <FormItem className="flex flex-row items-start space-x-3 space-y-0">
+                    <FormControl>
+                      <Checkbox
+                        checked={field.value}
+                        onCheckedChange={field.onChange}
+                      />
+                    </FormControl>
+                    <div className="space-y-1 leading-none">
+                      <FormLabel>Evento pago</FormLabel>
+                    </div>
+                  </FormItem>
+                )}
+              />
+            </div>
+
+            {form.watch('is_paid') && (
+              <FormField
+                control={form.control}
+                name="price"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Preço (R$)</FormLabel>
+                    <FormControl>
+                      <Input 
+                        type="number" 
+                        step="0.01"
+                        min="0"
+                        placeholder="Ex: 15.00"
+                        {...field}
+                        onChange={(e) => field.onChange(e.target.value ? parseFloat(e.target.value) : 0)}
                       />
                     </FormControl>
                     <FormMessage />
