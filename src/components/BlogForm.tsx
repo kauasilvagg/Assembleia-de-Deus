@@ -3,6 +3,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { useEmailNotifications } from '@/hooks/useEmailNotifications';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
@@ -35,6 +36,7 @@ interface BlogFormProps {
 const BlogForm = ({ isOpen, onClose, onSuccess }: BlogFormProps) => {
   const [loading, setLoading] = useState(false);
   const { toast } = useToast();
+  const { sendNotification } = useEmailNotifications();
   const { user } = useAuth();
 
   const form = useForm<BlogFormData>({
@@ -80,11 +82,28 @@ const BlogForm = ({ isOpen, onClose, onSuccess }: BlogFormProps) => {
         published_at: data.is_published ? new Date().toISOString() : null,
       };
 
-      const { error } = await supabase
+      const { data: insertedData, error } = await supabase
         .from('blog_posts')
-        .insert(blogData);
+        .insert(blogData)
+        .select();
 
       if (error) throw error;
+
+      // Send email notification for new blog post
+      if (data.is_published && insertedData && insertedData[0]) {
+        try {
+          await sendNotification({
+            type: 'blog',
+            title: data.title,
+            description: data.excerpt || data.content?.substring(0, 150) + '...',
+            content_id: insertedData[0].id,
+            author_name: blogData.author_name,
+          });
+        } catch (notificationError) {
+          console.error('Failed to send email notification:', notificationError);
+          // Don't fail the form submission if notification fails
+        }
+      }
 
       toast({
         title: "Artigo criado com sucesso!",

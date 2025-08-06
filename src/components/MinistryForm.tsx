@@ -7,6 +7,7 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { useToast } from '@/hooks/use-toast';
+import { useEmailNotifications } from '@/hooks/useEmailNotifications';
 
 interface Ministry {
   id: string;
@@ -29,6 +30,7 @@ interface MinistryFormProps {
 
 const MinistryForm = ({ ministry, onSuccess, onCancel }: MinistryFormProps) => {
   const { toast } = useToast();
+  const { sendNotification } = useEmailNotifications();
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
     name: ministry?.name || '',
@@ -62,11 +64,27 @@ const MinistryForm = ({ ministry, onSuccess, onCancel }: MinistryFormProps) => {
         });
       } else {
         // Criar novo ministério
-        const { error } = await supabase
+        const { data: insertedData, error } = await supabase
           .from('ministries')
-          .insert([{ ...formData, is_active: true }]);
+          .insert([{ ...formData, is_active: true }])
+          .select();
 
         if (error) throw error;
+
+        // Send email notification for new ministry
+        if (insertedData && insertedData[0]) {
+          try {
+            await sendNotification({
+              type: 'ministry',
+              title: formData.name,
+              description: formData.description || undefined,
+              content_id: insertedData[0].id,
+            });
+          } catch (notificationError) {
+            console.error('Failed to send email notification:', notificationError);
+            // Don't fail the form submission if notification fails
+          }
+        }
 
         toast({
           title: "Sucesso",

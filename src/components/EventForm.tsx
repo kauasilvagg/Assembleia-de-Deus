@@ -13,6 +13,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { Switch } from '@/components/ui/switch';
 import { Calendar, Clock, MapPin, X } from 'lucide-react';
+import { useEmailNotifications } from '@/hooks/useEmailNotifications';
 
 const eventFormSchema = z.object({
   title: z.string().min(1, 'Título é obrigatório'),
@@ -38,6 +39,7 @@ interface EventFormProps {
 const EventForm = ({ onClose, onSuccess }: EventFormProps) => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { toast } = useToast();
+  const { sendNotification } = useEmailNotifications();
 
   const form = useForm<EventFormData>({
     resolver: zodResolver(eventFormSchema),
@@ -81,13 +83,30 @@ const EventForm = ({ onClose, onSuccess }: EventFormProps) => {
 
       console.log('Sending to database:', eventData);
 
-      const { error } = await supabase
+      const { data: insertedData, error } = await supabase
         .from('events')
-        .insert([eventData]);
+        .insert([eventData])
+        .select();
 
       if (error) {
         console.error('Error creating event:', error);
         throw error;
+      }
+
+      // Send email notification for new event
+      if (insertedData && insertedData[0]) {
+        try {
+          await sendNotification({
+            type: 'event',
+            title: data.title,
+            description: data.description || undefined,
+            content_id: insertedData[0].id,
+            event_date: data.event_date,
+          });
+        } catch (notificationError) {
+          console.error('Failed to send email notification:', notificationError);
+          // Don't fail the form submission if notification fails
+        }
       }
 
       toast({

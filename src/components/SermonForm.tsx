@@ -8,6 +8,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { Checkbox } from '@/components/ui/checkbox';
 import { useToast } from '@/hooks/use-toast';
+import { useEmailNotifications } from '@/hooks/useEmailNotifications';
 
 interface Sermon {
   id: string;
@@ -32,6 +33,7 @@ interface SermonFormProps {
 
 const SermonForm = ({ sermon, onSuccess, onCancel }: SermonFormProps) => {
   const { toast } = useToast();
+  const { sendNotification } = useEmailNotifications();
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
     title: sermon?.title || '',
@@ -73,11 +75,28 @@ const SermonForm = ({ sermon, onSuccess, onCancel }: SermonFormProps) => {
           description: "Sermão atualizado com sucesso."
         });
       } else {
-        const { error } = await supabase
+        const { data: insertedData, error } = await supabase
           .from('sermons')
-          .insert([submitData]);
+          .insert([submitData])
+          .select();
 
         if (error) throw error;
+
+        // Send email notification for new sermon
+        if (insertedData && insertedData[0]) {
+          try {
+            await sendNotification({
+              type: 'sermon',
+              title: formData.title,
+              description: formData.description || undefined,
+              content_id: insertedData[0].id,
+              preacher_name: formData.preacher_name,
+            });
+          } catch (notificationError) {
+            console.error('Failed to send email notification:', notificationError);
+            // Don't fail the form submission if notification fails
+          }
+        }
 
         toast({
           title: "Sucesso",
