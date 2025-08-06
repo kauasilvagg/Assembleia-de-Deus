@@ -197,14 +197,17 @@ const Blog = () => {
               {featuredPosts.map((post) => (
                 <Card key={post.id} className="overflow-hidden hover:shadow-xl transition-all duration-300">
                   <div className="aspect-video bg-gradient-to-br from-bethel-blue to-bethel-navy relative">
-                    <img 
-                      src={post.image} 
-                      alt={post.title}
-                      className="w-full h-full object-cover opacity-20"
-                    />
-                    <div className="absolute inset-0 flex items-center justify-center">
-                      <BookOpen className="w-12 h-12 text-white" />
-                    </div>
+                    {post.featured_image_url ? (
+                      <img 
+                        src={post.featured_image_url} 
+                        alt={post.title}
+                        className="w-full h-full object-cover opacity-80"
+                      />
+                    ) : (
+                      <div className="absolute inset-0 flex items-center justify-center">
+                        <BookOpen className="w-12 h-12 text-white" />
+                      </div>
+                    )}
                     <Badge className="absolute top-4 left-4 bg-bethel-gold text-white border-0">
                       Destaque
                     </Badge>
@@ -215,7 +218,7 @@ const Blog = () => {
                       <Badge className={`${getCategoryColor(post.category)} border-0`}>
                         {getCategoryLabel(post.category)}
                       </Badge>
-                      <span className="text-sm text-gray-500">{post.readTime}</span>
+                      <span className="text-sm text-gray-500">{post.read_time || 5} min de leitura</span>
                     </div>
                     
                     <h3 className="text-xl font-semibold text-gray-900 mb-3 line-clamp-2">
@@ -223,22 +226,26 @@ const Blog = () => {
                     </h3>
                     
                     <p className="text-gray-600 mb-4 line-clamp-3">
-                      {post.excerpt}
+                      {post.excerpt || post.content.substring(0, 150) + '...'}
                     </p>
                     
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-3">
                         <Avatar className="w-8 h-8">
-                          <AvatarImage src={post.author.avatar} />
-                          <AvatarFallback>{post.author.name.charAt(0)}</AvatarFallback>
+                          <AvatarFallback>{post.author_name?.charAt(0) || 'A'}</AvatarFallback>
                         </Avatar>
                         <div>
-                          <p className="text-sm font-medium text-gray-900">{post.author.name}</p>
-                          <p className="text-xs text-gray-500">{post.author.role}</p>
+                          <p className="text-sm font-medium text-gray-900">{post.author_name}</p>
+                          <p className="text-xs text-gray-500">{formatDate(post.created_at)}</p>
                         </div>
                       </div>
                       
-                      <Button variant="ghost" size="sm" className="text-bethel-blue hover:text-bethel-navy">
+                      <Button 
+                        variant="ghost" 
+                        size="sm" 
+                        className="text-bethel-blue hover:text-bethel-navy"
+                        onClick={() => navigate(`/blog/${post.slug}`)}
+                      >
                         Ler mais <ArrowRight className="w-4 h-4 ml-1" />
                       </Button>
                     </div>
@@ -399,7 +406,7 @@ const Blog = () => {
                     <Badge className={`${getCategoryColor(post.category)} border-0`}>
                       {getCategoryLabel(post.category)}
                     </Badge>
-                    <span className="text-sm text-gray-500">{formatDate(post.publishDate)}</span>
+                    <span className="text-sm text-gray-500">{formatDate(post.created_at)}</span>
                   </div>
                   
                   <h3 className="font-semibold text-lg text-gray-900 mb-2 line-clamp-2">
@@ -408,14 +415,19 @@ const Blog = () => {
                   
                   <div className="flex items-center text-gray-600 text-sm mb-3">
                     <User className="w-4 h-4 mr-1" />
-                    {post.author.name}
+                    {post.author_name}
                   </div>
                   
                   <p className="text-gray-600 text-sm line-clamp-2 mb-4">
-                    {post.excerpt}
+                    {post.excerpt || post.content.substring(0, 100) + '...'}
                   </p>
                   
-                  <Button variant="outline" size="sm" className="w-full">
+                  <Button 
+                    variant="outline" 
+                    size="sm" 
+                    className="w-full"
+                    onClick={() => navigate(`/blog/${post.slug}`)}
+                  >
                     Ler Artigo
                   </Button>
                 </CardContent>
