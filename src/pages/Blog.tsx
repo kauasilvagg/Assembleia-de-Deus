@@ -426,8 +426,17 @@ const Blog = () => {
       </section>
 
       <Footer />
+
+      {/* Blog Form Dialog */}
+      {showBlogForm && (
+        <BlogForm 
+          isOpen={showBlogForm}
+          onClose={() => setShowBlogForm(false)}
+          onSuccess={handleBlogFormSuccess}
+        />
+      )}
     </div>
   );
 };
 
-export default Blog; 
+export default Blog;
