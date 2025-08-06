@@ -5,7 +5,7 @@ import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Search, Filter, Calendar, User, Tag, ArrowRight, BookOpen, Plus } from 'lucide-react';
+import { Search, Filter, Calendar, User, Tag, ArrowRight, BookOpen, Plus, Trash2 } from 'lucide-react';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import BlogForm from '@/components/BlogForm';
@@ -79,6 +79,35 @@ const Blog = () => {
 
   const handleBlogFormSuccess = () => {
     fetchBlogPosts();
+  };
+
+  const handleDeletePost = async (postId: string, postTitle: string) => {
+    if (!window.confirm(`Tem certeza que deseja excluir o artigo "${postTitle}"?`)) {
+      return;
+    }
+
+    try {
+      const { error } = await supabase
+        .from('blog_posts')
+        .delete()
+        .eq('id', postId);
+
+      if (error) throw error;
+
+      toast({
+        title: 'Artigo excluído',
+        description: 'O artigo foi excluído com sucesso.',
+      });
+
+      fetchBlogPosts();
+    } catch (error) {
+      console.error('Error deleting post:', error);
+      toast({
+        title: 'Erro ao excluir artigo',
+        description: 'Não foi possível excluir o artigo. Tente novamente.',
+        variant: 'destructive',
+      });
+    }
   };
 
   const categories = [
@@ -221,9 +250,21 @@ const Blog = () => {
                       <span className="text-sm text-gray-500">{post.read_time || 5} min de leitura</span>
                     </div>
                     
-                    <h3 className="text-xl font-semibold text-gray-900 mb-3 line-clamp-2">
-                      {post.title}
-                    </h3>
+                    <div className="flex justify-between items-start mb-3">
+                      <h3 className="text-xl font-semibold text-gray-900 line-clamp-2 flex-1">
+                        {post.title}
+                      </h3>
+                      {isAdmin && (
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => handleDeletePost(post.id, post.title)}
+                          className="text-red-500 hover:text-red-700 hover:bg-red-50 ml-2"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </Button>
+                      )}
+                    </div>
                     
                     <p className="text-gray-600 mb-4 line-clamp-3">
                       {post.excerpt || post.content.substring(0, 150) + '...'}
@@ -346,9 +387,21 @@ const Blog = () => {
                       </Badge>
                     </div>
                     
-                    <h3 className="text-lg font-semibold text-gray-900 mb-3 line-clamp-2">
-                      {post.title}
-                    </h3>
+                    <div className="flex justify-between items-start mb-3">
+                      <h3 className="text-lg font-semibold text-gray-900 line-clamp-2 flex-1">
+                        {post.title}
+                      </h3>
+                      {isAdmin && (
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => handleDeletePost(post.id, post.title)}
+                          className="text-red-500 hover:text-red-700 hover:bg-red-50 ml-2"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </Button>
+                      )}
+                    </div>
                     
                     <p className="text-gray-600 text-sm mb-4 line-clamp-3">
                       {post.excerpt || post.content.substring(0, 150) + '...'}

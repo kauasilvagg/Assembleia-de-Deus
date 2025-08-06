@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Calendar, Clock, MapPin, Search, Filter, CalendarDays, Plus, CreditCard } from 'lucide-react';
+import { Calendar, Clock, MapPin, Search, Filter, CalendarDays, Plus, CreditCard, Trash2 } from 'lucide-react';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import EventForm from '@/components/EventForm';
@@ -153,6 +153,35 @@ const Events = () => {
     fetchEvents();
   };
 
+  const handleDeleteEvent = async (eventId: string, eventTitle: string) => {
+    if (!window.confirm(`Tem certeza que deseja excluir o evento "${eventTitle}"?`)) {
+      return;
+    }
+
+    try {
+      const { error } = await supabase
+        .from('events')
+        .delete()
+        .eq('id', eventId);
+
+      if (error) throw error;
+
+      toast({
+        title: 'Evento excluído',
+        description: 'O evento foi excluído com sucesso.',
+      });
+
+      fetchEvents();
+    } catch (error) {
+      console.error('Error deleting event:', error);
+      toast({
+        title: 'Erro ao excluir evento',
+        description: 'Não foi possível excluir o evento. Tente novamente.',
+        variant: 'destructive',
+      });
+    }
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen bg-gray-50">
@@ -286,11 +315,21 @@ const Events = () => {
                     </Badge>
                   </div>
                   
-                  <CardHeader className="pb-4">
+                   <CardHeader className="pb-4">
                     <div className="flex justify-between items-start mb-2">
                       <CardTitle className="text-xl font-semibold text-gray-900 line-clamp-2">
                         {event.title}
                       </CardTitle>
+                      {isAdmin && (
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => handleDeleteEvent(event.id, event.title)}
+                          className="text-red-500 hover:text-red-700 hover:bg-red-50"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </Button>
+                      )}
                     </div>
                     <Badge variant="outline" className={`${getEventTypeColor(event.event_type)} border-0 w-fit`}>
                       {getEventTypeLabel(event.event_type)}
