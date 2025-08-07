@@ -364,74 +364,8 @@ export type Database = {
         }
         Relationships: [
           {
-            foreignKeyName: "course_enrollments_course_id_fkey"
-            columns: ["course_id"]
-            isOneToOne: false
-            referencedRelation: "courses"
-            referencedColumns: ["id"]
-          },
-          {
             foreignKeyName: "course_enrollments_member_id_fkey"
             columns: ["member_id"]
-            isOneToOne: false
-            referencedRelation: "members"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      courses: {
-        Row: {
-          created_at: string | null
-          description: string | null
-          duration_weeks: number | null
-          end_date: string | null
-          id: string
-          instructor_id: string | null
-          is_active: boolean | null
-          location: string | null
-          max_students: number | null
-          meeting_day: string | null
-          meeting_time: string | null
-          name: string
-          start_date: string | null
-          updated_at: string | null
-        }
-        Insert: {
-          created_at?: string | null
-          description?: string | null
-          duration_weeks?: number | null
-          end_date?: string | null
-          id?: string
-          instructor_id?: string | null
-          is_active?: boolean | null
-          location?: string | null
-          max_students?: number | null
-          meeting_day?: string | null
-          meeting_time?: string | null
-          name: string
-          start_date?: string | null
-          updated_at?: string | null
-        }
-        Update: {
-          created_at?: string | null
-          description?: string | null
-          duration_weeks?: number | null
-          end_date?: string | null
-          id?: string
-          instructor_id?: string | null
-          is_active?: boolean | null
-          location?: string | null
-          max_students?: number | null
-          meeting_day?: string | null
-          meeting_time?: string | null
-          name?: string
-          start_date?: string | null
-          updated_at?: string | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "courses_instructor_id_fkey"
-            columns: ["instructor_id"]
             isOneToOne: false
             referencedRelation: "members"
             referencedColumns: ["id"]
