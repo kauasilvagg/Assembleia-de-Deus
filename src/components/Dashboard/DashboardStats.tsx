@@ -11,7 +11,7 @@ interface StatsData {
   totalDonations: number;
   monthlyDonations: number;
   activeVolunteers: number;
-  activeCourses: number;
+  activeCells: number;
   blogPosts: number;
 }
 
@@ -23,7 +23,7 @@ const DashboardStats = () => {
     totalDonations: 0,
     monthlyDonations: 0,
     activeVolunteers: 0,
-    activeCourses: 0,
+    activeCells: 0,
     blogPosts: 0
   });
   const [loading, setLoading] = useState(true);
@@ -78,9 +78,9 @@ const DashboardStats = () => {
         .select('*', { count: 'exact', head: true })
         .eq('is_active', true);
 
-      // Cursos ativos
-      const { count: activeCourses } = await supabase
-        .from('courses')
+      // Células ativas
+      const { count: activeCells } = await supabase
+        .from('cells')
         .select('*', { count: 'exact', head: true })
         .eq('is_active', true);
 
@@ -97,7 +97,7 @@ const DashboardStats = () => {
         totalDonations,
         monthlyDonations,
         activeVolunteers: activeVolunteers || 0,
-        activeCourses: activeCourses || 0,
+        activeCells: activeCells || 0,
         blogPosts: blogPosts || 0
       });
     } catch (error) {
@@ -144,9 +144,9 @@ const DashboardStats = () => {
       color: 'text-purple-600'
     },
     {
-      title: 'Cursos Ativos',
-      value: stats.activeCourses,
-      icon: BookOpen,
+      title: 'Células Ativas',
+      value: stats.activeCells,
+      icon: Users,
       color: 'text-indigo-600'
     },
     {
