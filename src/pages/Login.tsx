@@ -39,7 +39,24 @@ const Login = () => {
     setLoading(true);
 
     try {
-      if (isLogin) {
+      if (isForgot) {
+        const { error } = await supabase.auth.resetPasswordForEmail(email, {
+          redirectTo: `${window.location.origin}/reset-password`,
+        });
+        if (error) {
+          toast({
+            title: "Erro ao enviar e-mail",
+            description: error.message,
+            variant: "destructive"
+          });
+        } else {
+          setResetSent(true);
+          toast({
+            title: "E-mail enviado!",
+            description: "Enviamos um link para redefinir sua senha. Verifique sua caixa de entrada e o spam."
+          });
+        }
+      } else if (isLogin) {
         console.log('Attempting login for:', email);
         const { error } = await signIn(email, password);
         if (error) {
