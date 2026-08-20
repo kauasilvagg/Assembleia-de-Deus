@@ -20,6 +20,8 @@ const Login = () => {
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [isAnimating, setIsAnimating] = useState(false);
+  const [isForgot, setIsForgot] = useState(false);
+  const [resetSent, setResetSent] = useState(false);
   
   const { signIn, signUp, user } = useAuth();
   const { toast } = useToast();
