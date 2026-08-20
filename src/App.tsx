@@ -18,6 +18,7 @@ import Sermons from "./pages/Sermons";
 import Contact from "./pages/Contact";
 import Members from "./pages/Members";
 import Donations from "./pages/Donations";
+import ResetPassword from "./pages/ResetPassword";
 
 const queryClient = new QueryClient();
 
@@ -31,6 +32,7 @@ const App = () => (
           <Routes>
             <Route path="/" element={<Index />} />
             <Route path="/login" element={<Login />} />
+            <Route path="/reset-password" element={<ResetPassword />} />
             <Route path="/admin" element={<Admin />} />
             <Route path="/eventos" element={<Events />} />
             <Route path="/blog" element={<Blog />} />
