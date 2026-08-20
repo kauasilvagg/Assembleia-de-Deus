@@ -140,9 +140,15 @@ const Contact = () => {
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-2">
-                <div className="flex justify-between">
-                  <span className="font-medium">Domingo (Noite)</span>
-                  <span>18h30</span>
+                <div className="flex flex-col space-y-2">
+                  <div className="flex justify-between">
+                    <span className="font-medium">Domingo</span>
+                    <span>8:30h ás 20:30h</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="font-medium">Quinta</span>
+                    <span>19:30h ás 20:30h</span>
+                  </div>
                 </div>
               </CardContent>
             </Card>

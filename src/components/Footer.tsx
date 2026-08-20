@@ -38,7 +38,10 @@ const Footer = () => {
             <div className="space-y-2 text-sm text-gray-400">
               <div className="flex items-center space-x-2">
                 <Calendar className="w-4 h-4" />
-                <span>Domingo: 8h e 19h</span>
+                <span className="whitespace-pre-line">
+                  Domingo: 8:30h ás 20:30h{"\n"}
+                  Quinta: 19:30h ás 20:30h
+                </span>
               </div>
             </div>
           </div>

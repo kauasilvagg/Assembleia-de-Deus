@@ -55,8 +55,8 @@ const handler = async (req: Request): Promise<Response> => {
           
           <div style="background-color: #1e40af; color: white; padding: 20px; border-radius: 8px; margin: 20px 0;">
             <h3 style="margin-top: 0; color: white;">Horários de Culto</h3>
-            <p style="margin: 5px 0;">📅 Domingo (Manhã): 8h00</p>
-            <p style="margin: 5px 0;">📅 Domingo (Noite): 19h00</p>
+            <p style="margin: 5px 0;">📅 Domingo: 8:30h ás 20:30h</p>
+            <p style="margin: 5px 0;">📅 Quinta: 19:30h ás 20:30h</p>
           </div>
           
           <div style="border-top: 1px solid #e5e7eb; padding-top: 20px; margin-top: 30px; text-align: center; color: #666;">
