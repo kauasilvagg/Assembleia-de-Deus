@@ -6,8 +6,9 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { ArrowLeft, LogIn, UserPlus, Shield, User, Eye, EyeOff, Mail, Lock, Sparkles } from 'lucide-react';
+import { ArrowLeft, LogIn, UserPlus, Shield, User, Eye, EyeOff, Mail, Lock, Sparkles, KeyRound } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
+import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 
 const Login = () => {
@@ -19,6 +20,8 @@ const Login = () => {
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [isAnimating, setIsAnimating] = useState(false);
+  const [isForgot, setIsForgot] = useState(false);
+  const [resetSent, setResetSent] = useState(false);
   
   const { signIn, signUp, user } = useAuth();
   const { toast } = useToast();
@@ -36,7 +39,24 @@ const Login = () => {
     setLoading(true);
 
     try {
-      if (isLogin) {
+      if (isForgot) {
+        const { error } = await supabase.auth.resetPasswordForEmail(email, {
+          redirectTo: `${window.location.origin}/reset-password`,
+        });
+        if (error) {
+          toast({
+            title: "Erro ao enviar e-mail",
+            description: error.message,
+            variant: "destructive"
+          });
+        } else {
+          setResetSent(true);
+          toast({
+            title: "E-mail enviado!",
+            description: "Enviamos um link para redefinir sua senha. Verifique sua caixa de entrada e o spam."
+          });
+        }
+      } else if (isLogin) {
         console.log('Attempting login for:', email);
         const { error } = await signIn(email, password);
         if (error) {
@@ -81,9 +101,20 @@ const Login = () => {
   const toggleMode = () => {
     setIsAnimating(true);
     setTimeout(() => {
-      setIsLogin(!isLogin);
+      if (isForgot) {
+        setIsForgot(false);
+        setResetSent(false);
+      } else {
+        setIsLogin(!isLogin);
+      }
       setIsAnimating(false);
     }, 150);
+  };
+
+  const openForgot = () => {
+    setIsForgot(true);
+    setResetSent(false);
+    setIsLogin(true);
   };
 
   return (
