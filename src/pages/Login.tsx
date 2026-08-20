@@ -101,9 +101,20 @@ const Login = () => {
   const toggleMode = () => {
     setIsAnimating(true);
     setTimeout(() => {
-      setIsLogin(!isLogin);
+      if (isForgot) {
+        setIsForgot(false);
+        setResetSent(false);
+      } else {
+        setIsLogin(!isLogin);
+      }
       setIsAnimating(false);
     }, 150);
+  };
+
+  const openForgot = () => {
+    setIsForgot(true);
+    setResetSent(false);
+    setIsLogin(true);
   };
 
   return (
