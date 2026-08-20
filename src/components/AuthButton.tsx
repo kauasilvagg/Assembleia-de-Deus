@@ -25,7 +25,11 @@ const AuthButton = () => {
         <span className="text-sm text-gray-600 hidden md:block">
           Olá, {user.user_metadata?.full_name || user.email}
           {userRole && (
-            <span className="ml-1 text-xs bg-gray-100 px-2 py-1 rounded">
+            <span
+              className={`ml-1 text-xs font-semibold px-2 py-1 rounded text-white ${
+                userRole === 'admin' ? 'bg-red-600' : 'bg-green-600'
+              }`}
+            >
               {userRole === 'admin' ? 'Admin' : 'Usuário'}
             </span>
           )}
