@@ -64,23 +64,33 @@ const Ministries = () => {
     if (!confirm('Tem certeza que deseja excluir este ministério?')) return;
 
     try {
-      const { error } = await supabase
+      const { data, error } = await supabase
         .from('ministries')
-        .update({ is_active: false })
-        .eq('id', id);
+        .delete()
+        .eq('id', id)
+        .select('id');
 
       if (error) throw error;
 
-      setMinistries(ministries.filter(m => m.id !== id));
+      if (!data || data.length === 0) {
+        toast({
+          title: "Sem permissão",
+          description: "Apenas administradores podem excluir ministérios.",
+          variant: "destructive"
+        });
+        return;
+      }
+
+      setMinistries((prev) => prev.filter(m => m.id !== id));
       toast({
         title: "Sucesso",
         description: "Ministério excluído com sucesso."
       });
-    } catch (error) {
+    } catch (error: any) {
       console.error('Erro ao excluir ministério:', error);
       toast({
         title: "Erro",
-        description: "Não foi possível excluir o ministério.",
+        description: error?.message || "Não foi possível excluir o ministério.",
         variant: "destructive"
       });
     }
