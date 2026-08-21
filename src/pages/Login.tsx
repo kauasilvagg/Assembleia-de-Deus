@@ -275,38 +275,55 @@ const Login = () => {
                 </div>
               </div>
               
-              <div className="space-y-3">
-                <Label htmlFor="password" className="text-sm font-medium text-foreground">Senha</Label>
-                <div className="relative group">
-                  <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-muted-foreground group-focus-within:text-primary transition-colors" />
-                  <Input
-                    id="password"
-                    type={showPassword ? "text" : "password"}
-                    placeholder="Sua senha"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    className="pl-10 pr-12 h-12 border-2 border-border focus:border-primary transition-all duration-300 hover:border-primary/50"
-                    required
-                  />
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    size="sm"
-                    className="absolute right-1 top-1/2 transform -translate-y-1/2 h-10 w-10 hover:bg-transparent"
-                    onClick={() => setShowPassword(!showPassword)}
-                  >
-                    {showPassword ? (
-                      <EyeOff className="w-4 h-4 text-muted-foreground hover:text-primary transition-colors" />
-                    ) : (
-                      <Eye className="w-4 h-4 text-muted-foreground hover:text-primary transition-colors" />
-                    )}
-                  </Button>
+              {!isForgot && (
+                <div className="space-y-3">
+                  <Label htmlFor="password" className="text-sm font-medium text-foreground">Senha</Label>
+                  <div className="relative group">
+                    <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-muted-foreground group-focus-within:text-primary transition-colors" />
+                    <Input
+                      id="password"
+                      type={showPassword ? "text" : "password"}
+                      placeholder="Sua senha"
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                      className="pl-10 pr-12 h-12 border-2 border-border focus:border-primary transition-all duration-300 hover:border-primary/50"
+                      required
+                    />
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="sm"
+                      className="absolute right-1 top-1/2 transform -translate-y-1/2 h-10 w-10 hover:bg-transparent"
+                      onClick={() => setShowPassword(!showPassword)}
+                    >
+                      {showPassword ? (
+                        <EyeOff className="w-4 h-4 text-muted-foreground hover:text-primary transition-colors" />
+                      ) : (
+                        <Eye className="w-4 h-4 text-muted-foreground hover:text-primary transition-colors" />
+                      )}
+                    </Button>
+                  </div>
+                  {isLogin && (
+                    <button
+                      type="button"
+                      onClick={openForgot}
+                      className="text-xs text-primary hover:underline"
+                    >
+                      Esqueceu sua senha?
+                    </button>
+                  )}
                 </div>
-              </div>
+              )}
+
+              {isForgot && resetSent && (
+                <p className="text-sm text-muted-foreground bg-muted/30 p-3 rounded-md">
+                  Enviamos um link de redefinição para <strong>{email}</strong>. Verifique sua caixa de entrada e o spam.
+                </p>
+              )}
 
               <Button 
                 type="submit" 
-                className="w-full h-12 bg-gradient-to-r from-primary to-secondary hover:from-primary/90 hover:to-secondary/90 text-primary-foreground font-semibold shadow-lg hover:shadow-primary/25 transition-all duration-300 hover:scale-[1.02] group"
+                className="w-full h-12 bg-gradient-to-r from-primary to-secondary hover:from-primary/90 hover:to-secondary/90 text-primary-foreground font-semibold shadow-lg hover:shadow-primary/25 transition-all duration-300 group"
                 disabled={loading}
               >
                 {loading ? (
@@ -314,21 +331,26 @@ const Login = () => {
                     <div className="w-4 h-4 border-2 border-primary-foreground/30 border-t-primary-foreground rounded-full animate-spin mr-2"></div>
                     Carregando...
                   </div>
+                ) : isForgot ? (
+                  <>
+                    <KeyRound className="w-4 h-4 mr-2" />
+                    Enviar link de recuperação
+                  </>
                 ) : isLogin ? (
                   <>
-                    <LogIn className="w-4 h-4 mr-2 group-hover:scale-110 transition-transform" />
-                    Entrar
+                    <LogIn className="w-4 h-4 mr-2" />
+                    Entrar como {userType === 'admin' ? 'Administrador' : 'Usuário'}
                   </>
                 ) : (
                   <>
-                    <UserPlus className="w-4 h-4 mr-2 group-hover:scale-110 transition-transform" />
+                    <UserPlus className="w-4 h-4 mr-2" />
                     Criar Conta {userType === 'admin' ? 'de Administrador' : ''}
                   </>
                 )}
               </Button>
             </form>
 
-            <div className="mt-8 text-center">
+            <div className="mt-6 sm:mt-8 text-center">
               <div className="relative">
                 <div className="absolute inset-0 flex items-center">
                   <div className="w-full border-t border-border/50"></div>
@@ -341,17 +363,18 @@ const Login = () => {
               <Button
                 variant="ghost"
                 onClick={toggleMode}
-                className="mt-4 text-primary hover:text-primary/80 hover:bg-primary/10 transition-all duration-300 group"
+                className="mt-4 text-primary hover:text-primary/80 hover:bg-primary/10 transition-all duration-300 text-sm whitespace-normal h-auto py-2"
                 disabled={isAnimating}
               >
-                <span className="group-hover:scale-105 transition-transform">
-                  {isLogin 
-                    ? 'Não tem uma conta? Cadastre-se'
-                    : 'Já tem uma conta? Faça login'
-                  }
-                </span>
+                {isForgot
+                  ? 'Voltar para o login'
+                  : isLogin
+                  ? 'Não tem uma conta? Cadastre-se'
+                  : 'Já tem uma conta? Faça login'
+                }
               </Button>
             </div>
+
 
             {/* Informações sobre tipos de usuário */}
             {!isLogin && (
