@@ -57,7 +57,7 @@ const Login = () => {
           });
         }
       } else if (isLogin) {
-        console.log('Attempting login for:', email);
+        console.log('Attempting login for:', email, 'as', userType);
         const { error } = await signIn(email, password);
         if (error) {
           toast({
@@ -66,12 +66,27 @@ const Login = () => {
             variant: "destructive"
           });
         } else {
-          toast({
-            title: "Login realizado com sucesso!",
-            description: "Bem-vindo de volta!"
-          });
+          // Garante/consulta o papel real do usuário no banco
+          const { data: roleData } = await (supabase as any).rpc('ensure_user_role');
+          const realRole = (roleData as string) || 'user';
+
+          if (realRole !== userType) {
+            await supabase.auth.signOut();
+            toast({
+              title: "Tipo de acesso incorreto",
+              description: `Esta conta é do tipo "${realRole === 'admin' ? 'Administrador' : 'Usuário'}". Selecione o tipo correto para entrar.`,
+              variant: "destructive"
+            });
+          } else {
+            toast({
+              title: "Login realizado com sucesso!",
+              description: realRole === 'admin' ? "Bem-vindo, administrador!" : "Bem-vindo de volta!"
+            });
+            navigate(realRole === 'admin' ? '/admin' : '/');
+          }
         }
       } else {
+
         console.log('Attempting signup for:', email, 'as', userType);
         const { error } = await signUp(email, password, fullName, userType);
         if (error) {
