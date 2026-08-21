@@ -153,44 +153,49 @@ const Login = () => {
             Voltar ao site
           </Link>
           
-          <div className="flex items-center justify-center space-x-3 mb-6">
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-3 mb-6">
             <div className="relative">
-              <div className="w-16 h-16 bg-gradient-to-br from-primary to-primary/80 rounded-2xl flex items-center justify-center shadow-lg shadow-primary/25 hover:shadow-primary/40 transition-all duration-300 hover:scale-105">
-                <Sparkles className="w-8 h-8 text-primary-foreground" />
+              <div className="w-14 h-14 sm:w-16 sm:h-16 bg-gradient-to-br from-primary to-primary/80 rounded-2xl flex items-center justify-center shadow-lg shadow-primary/25 transition-all duration-300 hover:scale-105">
+                <span className="text-primary-foreground font-bold text-xl">ADS</span>
               </div>
               <div className="absolute -inset-1 bg-gradient-to-br from-primary to-secondary rounded-2xl opacity-20 blur animate-pulse"></div>
             </div>
-            <div className="text-left">
-              <h1 className="text-3xl font-bold text-foreground bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
+            <div className="text-center sm:text-left">
+              <h1 className="text-2xl sm:text-3xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
                 Assembleia de Deus
               </h1>
-              <h2 className="text-xl font-semibold text-muted-foreground">Shalom</h2>
+              <h2 className="text-lg sm:text-xl font-semibold text-muted-foreground">Shalom</h2>
               <p className="text-sm text-muted-foreground mt-1">
-                {isLogin ? 'Bem-vindo de volta!' : 'Junte-se à família'}
+                {isForgot ? 'Recupere seu acesso' : isLogin ? 'Bem-vindo de volta!' : 'Junte-se à família'}
               </p>
             </div>
           </div>
         </div>
 
         <Card className="shadow-2xl shadow-primary/10 border-0 bg-card/80 backdrop-blur-xl animate-scale-in hover:shadow-primary/20 transition-all duration-500">
-          <CardHeader className="text-center pb-8 pt-8">
+          <CardHeader className="text-center pb-6 pt-6 sm:pb-8 sm:pt-8">
             <div className="flex items-center justify-center mb-4">
-              {isLogin ? (
+              {isForgot ? (
+                <KeyRound className="w-8 h-8 text-primary animate-fade-in" />
+              ) : isLogin ? (
                 <LogIn className="w-8 h-8 text-primary animate-fade-in" />
               ) : (
                 <UserPlus className="w-8 h-8 text-primary animate-fade-in" />
               )}
             </div>
-            <CardTitle className="text-2xl font-bold text-foreground bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
-              {isLogin ? 'Área do Membro' : 'Criar Conta'}
+            <CardTitle className="text-xl sm:text-2xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
+              {isForgot ? 'Recuperar Senha' : isLogin ? 'Área do Membro' : 'Criar Conta'}
             </CardTitle>
-            <CardDescription className="text-muted-foreground">
-              {isLogin 
+            <CardDescription className="text-muted-foreground text-sm">
+              {isForgot
+                ? 'Informe seu e-mail para receber o link de redefinição'
+                : isLogin
                 ? 'Acesse conteúdo exclusivo da nossa comunidade'
                 : 'Faça parte da nossa família cristã'
               }
             </CardDescription>
           </CardHeader>
+
           
           <CardContent className="pt-0">
             <form onSubmit={handleSubmit} className="space-y-6">
