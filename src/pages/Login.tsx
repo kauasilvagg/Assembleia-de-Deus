@@ -194,41 +194,47 @@ const Login = () => {
           
           <CardContent className="pt-0">
             <form onSubmit={handleSubmit} className="space-y-6">
-              {/* Seleção do tipo de usuário - só aparece no cadastro */}
-              {!isLogin && (
+              {/* Seleção do tipo de acesso - aparece no login e no cadastro (mobile-friendly) */}
+              {!isForgot && (
                 <div className="space-y-3 animate-fade-in">
-                  <Label htmlFor="userType" className="text-sm font-medium text-foreground">Tipo de Acesso</Label>
-                  <Select value={userType} onValueChange={(value: 'user' | 'admin') => setUserType(value)}>
-                    <SelectTrigger className="h-12 border-2 border-border focus:border-primary transition-all duration-300 hover:border-primary/50">
-                      <SelectValue placeholder="Selecione o tipo de acesso" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="user" className="hover:bg-primary/5">
-                        <div className="flex items-center space-x-3">
-                          <div className="p-1 rounded-md bg-primary/10">
-                            <User className="w-4 h-4 text-primary" />
-                          </div>
-                          <span>Usuário - Visualizar conteúdo</span>
-                        </div>
-                      </SelectItem>
-                      <SelectItem value="admin" className="hover:bg-secondary/5">
-                        <div className="flex items-center space-x-3">
-                          <div className="p-1 rounded-md bg-secondary/10">
-                            <Shield className="w-4 h-4 text-secondary" />
-                          </div>
-                          <span>Administrador - Gerenciar sistema</span>
-                        </div>
-                      </SelectItem>
-                    </SelectContent>
-                  </Select>
+                  <Label className="text-sm font-medium text-foreground">Tipo de Acesso</Label>
+                  <div className="grid grid-cols-2 gap-2">
+                    <button
+                      type="button"
+                      onClick={() => setUserType('user')}
+                      aria-pressed={userType === 'user'}
+                      className={`flex flex-col items-center justify-center gap-1 rounded-lg border-2 px-2 py-3 text-xs sm:text-sm font-medium transition-all ${
+                        userType === 'user'
+                          ? 'border-primary bg-primary/10 text-primary'
+                          : 'border-border text-muted-foreground hover:border-primary/50'
+                      }`}
+                    >
+                      <User className="w-5 h-5" />
+                      Usuário
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setUserType('admin')}
+                      aria-pressed={userType === 'admin'}
+                      className={`flex flex-col items-center justify-center gap-1 rounded-lg border-2 px-2 py-3 text-xs sm:text-sm font-medium transition-all ${
+                        userType === 'admin'
+                          ? 'border-destructive bg-destructive/10 text-destructive'
+                          : 'border-border text-muted-foreground hover:border-primary/50'
+                      }`}
+                    >
+                      <Shield className="w-5 h-5" />
+                      Administrador
+                    </button>
+                  </div>
                   <p className="text-xs text-muted-foreground bg-muted/30 p-2 rounded-md">
-                    {userType === 'admin' 
+                    {userType === 'admin'
                       ? 'Administradores podem criar e gerenciar conteúdo, eventos, sermões e usuários.'
                       : 'Usuários podem visualizar conteúdo, participar de eventos e acessar área de membros.'
                     }
                   </p>
                 </div>
               )}
+
 
               {!isLogin && (
                 <div className="space-y-3 animate-fade-in">
