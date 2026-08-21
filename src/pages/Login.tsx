@@ -27,12 +27,14 @@ const Login = () => {
   const { toast } = useToast();
   const navigate = useNavigate();
 
-  // Redirecionar se já estiver logado
+  // Redirecionar apenas se já estiver logado ao abrir a página
   useEffect(() => {
-    if (user) {
-      navigate('/');
-    }
-  }, [user, navigate]);
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      if (session) navigate('/');
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
