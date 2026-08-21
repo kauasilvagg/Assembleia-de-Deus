@@ -379,8 +379,6 @@ const Login = () => {
             {/* Informações sobre tipos de usuário */}
             {!isLogin && !isForgot && (
               <div className="mt-6 p-4 sm:p-6 bg-gradient-to-r from-muted/50 to-muted/30 rounded-xl border border-border/50 text-sm animate-fade-in">
-
-              <div className="mt-6 p-6 bg-gradient-to-r from-muted/50 to-muted/30 rounded-xl border border-border/50 text-sm animate-fade-in">
                 <h4 className="font-semibold mb-4 text-foreground flex items-center">
                   <Sparkles className="w-4 h-4 mr-2 text-primary" />
                   Tipos de Usuário:
