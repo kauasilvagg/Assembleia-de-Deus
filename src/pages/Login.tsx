@@ -406,17 +406,18 @@ const Login = () => {
               </div>
             )}
 
-            {isLogin && (
+            {isLogin && !isForgot && (
               <div className="mt-6 text-center text-sm">
                 <p className="text-muted-foreground mb-2">Precisa de ajuda? Entre em contato conosco:</p>
                 <a 
-                  href="mailto:contato@igrejashalom.com.br" 
-                  className="text-primary hover:text-primary/80 underline-offset-4 hover:underline transition-all duration-300 font-medium"
+                  href="mailto:magalhaeskaua13@gmail.com" 
+                  className="text-primary hover:text-primary/80 underline-offset-4 hover:underline transition-all duration-300 font-medium break-all"
                 >
-                  contato@igrejashalom.com.br
+                  magalhaeskaua13@gmail.com
                 </a>
               </div>
             )}
+
           </CardContent>
         </Card>
       </div>
