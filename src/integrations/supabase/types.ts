@@ -889,6 +889,7 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      ensure_user_role: { Args: never; Returns: string }
       generate_slug: { Args: { title: string }; Returns: string }
       has_role: {
         Args: {
