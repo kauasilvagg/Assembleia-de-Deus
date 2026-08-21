@@ -241,7 +241,7 @@ const Login = () => {
               )}
 
 
-              {!isLogin && (
+              {!isLogin && !isForgot && (
                 <div className="space-y-3 animate-fade-in">
                   <Label htmlFor="fullName" className="text-sm font-medium text-foreground">Nome Completo</Label>
                   <div className="relative group">
