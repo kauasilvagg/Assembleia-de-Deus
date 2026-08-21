@@ -21,19 +21,21 @@ const AuthButton = () => {
 
   if (user) {
     return (
-      <div className="flex items-center space-x-2">
-        <span className="text-sm text-gray-600 hidden md:block">
-          Olá, {user.user_metadata?.full_name || user.email}
+      <div className="flex flex-wrap items-center gap-2">
+        <div className="flex items-center gap-2 min-w-0">
+          <span className="text-sm text-gray-600 truncate max-w-[140px] md:max-w-[200px]">
+            {user.user_metadata?.full_name || user.email}
+          </span>
           {userRole && (
             <span
-              className={`ml-1 text-xs font-semibold px-2 py-1 rounded text-white ${
+              className={`text-xs font-semibold px-2 py-1 rounded text-white shrink-0 ${
                 userRole === 'admin' ? 'bg-red-600' : 'bg-green-600'
               }`}
             >
               {userRole === 'admin' ? 'Admin' : 'Usuário'}
             </span>
           )}
-        </span>
+        </div>
         {isAdmin && (
           <Link to="/admin">
             <Button variant="outline" size="sm" className="flex items-center space-x-1">
@@ -54,6 +56,7 @@ const AuthButton = () => {
       </div>
     );
   }
+
 
   return (
     <Link to="/login">
